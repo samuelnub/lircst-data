@@ -29,7 +29,7 @@ int main() {
     uiManager->ApplyCommand("/tracking/verbose 1");
 
     // Start a run
-    int noOfEvents = 5;
+    int noOfEvents = 10000;
     runManager->BeamOn(noOfEvents);
 
     // Terminate job
