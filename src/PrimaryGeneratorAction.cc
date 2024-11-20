@@ -4,9 +4,7 @@
 #include "Randomize.hh"
 
 namespace lircst {
-    PrimaryGeneratorAction::PrimaryGeneratorAction() 
-        : G4VUserPrimaryGeneratorAction(), 
-          fParticleGun(0) {
+    PrimaryGeneratorAction::PrimaryGeneratorAction() : G4VUserPrimaryGeneratorAction() {
         
         G4int noOfParticles = 1;
         this->fParticleGun = new G4ParticleGun(noOfParticles);

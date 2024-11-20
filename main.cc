@@ -10,29 +10,34 @@ using namespace lircst;
 
 // Based on https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/GettingStarted/mainProgram.html
 int main() {
-    // Default run manager - manages flow of program, and event loop(s) in a run
-    auto runManager = G4RunManagerFactory::CreateRunManager();
+    try {
+        // Default run manager - manages flow of program, and event loop(s) in a run
+        auto runManager = G4RunManagerFactory::CreateRunManager();
 
-    // Set must-have user init classes
-    runManager->SetUserInitialization(new DetectorConstruction);
-    runManager->SetUserInitialization(new PhysicsList);
-    runManager->SetUserInitialization(new ActionInitialisation);
+        // Set must-have user init classes
+        runManager->SetUserInitialization(new DetectorConstruction);
+        runManager->SetUserInitialization(new PhysicsList);
+        runManager->SetUserInitialization(new ActionInitialisation);
 
-    // Init G4 kernel
-    runManager->Initialize();
+        // Init G4 kernel
+        runManager->Initialize();
 
-    // UI manager pointer
-    auto uiManager = G4UImanager::GetUIpointer();
-    // Set verbosities for UI
-    uiManager->ApplyCommand("/run/verbose 1");
-    uiManager->ApplyCommand("/event/verbose 1");
-    uiManager->ApplyCommand("/tracking/verbose 1");
+        // UI manager pointer
+        auto uiManager = G4UImanager::GetUIpointer();
+        // Set verbosities for UI
+        uiManager->ApplyCommand("/run/verbose 1");
+        uiManager->ApplyCommand("/event/verbose 1");
+        uiManager->ApplyCommand("/tracking/verbose 1");
 
-    // Start a run
-    int noOfEvents = 10000;
-    runManager->BeamOn(noOfEvents);
+        // Start a run
+        int noOfEvents = 10000;
+        runManager->BeamOn(noOfEvents);
 
-    // Terminate job
-    delete runManager;
-    return 0;
+        // Terminate job
+        delete runManager;
+        return 0;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
 }

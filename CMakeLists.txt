@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 project(LircstData)
 
 # Find Geant4 package, activating all available UI and Vis drivers by default

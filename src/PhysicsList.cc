@@ -2,6 +2,8 @@
 
 #include "G4PhysicsListHelper.hh"
 #include "G4Gamma.hh"
+#include "G4Positron.hh"
+#include "G4Electron.hh"
 #include "G4PhotoElectricEffect.hh"
 #include "G4ComptonScattering.hh"
 #include "G4GammaConversion.hh"
@@ -10,6 +12,8 @@
 namespace lircst {
     void PhysicsList::ConstructParticle() {
         G4Gamma::GammaDefinition();
+        G4Positron::PositronDefinition();
+        G4Electron::ElectronDefinition();
     }
 
     void PhysicsList::ConstructProcess() {
