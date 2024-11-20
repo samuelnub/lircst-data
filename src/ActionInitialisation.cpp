@@ -12,4 +12,12 @@ namespace lircst {
 
         SetUserAction(new PrimaryGeneratorAction);
     }
+
+    void ActionInitialisation::BuildForMaster() const {
+        // Do nothing
+    }
+
+    G4VSteppingVerbose* ActionInitialisation::InitializeSteppingVerbose() const {
+        return nullptr;
+    }
 }
