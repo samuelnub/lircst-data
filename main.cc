@@ -49,8 +49,8 @@ int main(int argc,char** argv) {
         }
 
         // Start a run
-        int noOfEvents = 100;
-        runManager->BeamOn(noOfEvents);
+        //int noOfEvents = 100;
+        //runManager->BeamOn(noOfEvents);
         G4cout << "End of run tee hee" << G4endl;
 
         // Terminate job
