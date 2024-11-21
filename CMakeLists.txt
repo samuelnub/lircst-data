@@ -21,5 +21,17 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 add_executable(lircstData main.cc ${sources} ${headers})
 target_link_libraries(lircstData ${Geant4_LIBRARIES})
 
+set(LIRCSTDATA_SCRIPTS
+    vis.mac
+    )
+
+foreach(_script ${LIRCSTDATA_SCRIPTS})
+    configure_file(
+        ${PROJECT_SOURCE_DIR}/macro/${_script}
+        ${PROJECT_BINARY_DIR}/${_script}
+        COPYONLY
+    )
+endforeach()
+
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 install(TARGETS lircstData DESTINATION bin)
