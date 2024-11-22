@@ -14,6 +14,8 @@ namespace lircst {
         G4VPhysicalVolume* Construct() override;
         
         G4LogicalVolume* GetScoringVolume() const { return fScoringVolume; }
+
+        void ConstructSDandField() override;
     protected:
         G4LogicalVolume* fScoringVolume = nullptr;
     };

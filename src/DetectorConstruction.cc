@@ -6,6 +6,9 @@
 #include "G4PVPlacement.hh"
 #include "G4SystemOfUnits.hh"
 
+#include "G4MultiFunctionalDetector.hh"
+#include "G4SDManager.hh"
+
 namespace lircst {
     G4VPhysicalVolume* DetectorConstruction::Construct() {
         // World
@@ -22,5 +25,12 @@ namespace lircst {
 
         // Always return physical world
         return worldPhysical;
+    }
+
+    void DetectorConstruction::ConstructSDandField() {
+        // Setup MFD and Primitive Scorer(s)
+        auto mfd = new G4MultiFunctionalDetector("mfd");
+        G4SDManager::GetSDMpointer()->AddNewDetector(mfd);
+        // TOOD: Add primitive scorer(s)
     }
 }
