@@ -10,7 +10,7 @@ namespace lircst {
         this->fParticleGun = new G4ParticleGun(noOfParticles);
 
         // Set particle properties
-        G4double particleEnergy = 60000.0 * eV; // 60 keV seems reasonable to see the Compton effect take place
+        G4double particleEnergy = 60.0 * keV; // 60 keV seems reasonable to see the Compton effect take place
 
         this->fParticleGun->SetParticleDefinition(G4Gamma::GammaDefinition());
         this->fParticleGun->SetParticleEnergy(particleEnergy);

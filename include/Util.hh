@@ -19,9 +19,9 @@ namespace lircst {
         static const G4int GetNumPixelsX() { return fNumPixelsX; } 
         static const G4int GetNumPixelsY() { return fNumPixelsY; }
         static const G4int GetNumBins() { return fNumBins; }
-        static const G4int GetEnergyMin() { return fEnergyMin; }
-        static const G4int GetEnergyMax() { return fEnergyMax; }
-        static const G4int GetScorerSize() { return fScorerSize; }
+        static const G4double GetEnergyMin() { return fEnergyMin; }
+        static const G4double GetEnergyMax() { return fEnergyMax; }
+        static const G4double GetScorerSize() { return fScorerSize; }
 
     private:
         static const G4int fNumPixelsX = 16; // TODO: tiny for testing

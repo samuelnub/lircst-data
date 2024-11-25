@@ -30,7 +30,7 @@ namespace lircst {
         // Scoring volume
         // TODO: This shouldn't be water, and this shouldn't be where the phantom should go
         auto scoringVolumeSolid = new G4Box("ScoringVolume", scoringVolumeSize / 2, scoringVolumeSize / 2, scoringVolumeSize / 2);
-        fScoringVolume = new G4LogicalVolume(scoringVolumeSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_B-100_BONE"), "ScoringVolume");
+        fScoringVolume = new G4LogicalVolume(scoringVolumeSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_Pb"), "ScoringVolume");
         new G4PVPlacement(0, G4ThreeVector(), fScoringVolume, "ScoringVolume", worldLogical, false, 0);
 
         // Always return physical world

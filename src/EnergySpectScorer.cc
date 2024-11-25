@@ -13,6 +13,8 @@ namespace lircst {
         fNbins = nBins;
         fEMin = eMin;
         fEMax = eMax;
+
+        G4cout << "fNx, fNy, fNbins, fEMin, fEMax after constructor: " << fNx << ", " << fNy << ", " << fNbins << ", " << fEMin << ", " << fEMax << G4endl;
     }
 
     void EnergySpectScorer::Initialize(G4HCofThisEvent* hce) {
@@ -25,24 +27,35 @@ namespace lircst {
     }
 
     G4bool EnergySpectScorer::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
-        G4cout << "About to process hits..." << G4endl;
-
         // Get energy deposited in this step
         G4double edep = aStep->GetTotalEnergyDeposit();
-        if (edep == 0) return false;
+        G4String overzero = "";
+        if (edep > 0) overzero = "(over zero)";
+        G4cout << "About to process hits, edep = " << edep << overzero << G4endl;
+        //if (edep == 0) return false; // TODO: debugging
 
         // Get pos of the step, and what pixel that corresponds to
         // Get local pos - local to touchable!
-        auto touchable = aStep->GetPreStepPoint()->GetTouchable();
-        G4ThreeVector worldPos = aStep->GetPreStepPoint()->GetPosition();
+        auto touchable = aStep->GetPostStepPoint()->GetTouchable();
+        G4ThreeVector worldPos = aStep->GetPostStepPoint()->GetPosition();
         G4ThreeVector pos = touchable->GetHistory()->GetTopTransform().TransformPoint(worldPos);
+
+        G4cout << "World pos x, y = " << worldPos.x() << ", " << worldPos.y() << G4endl;
+        G4cout << "Local pos x, y = " << pos.x() << ", " << pos.y() << G4endl;
+
         G4int i = static_cast<G4int>((pos.x() - x_min) / pixel_size_x);
         G4int j = static_cast<G4int>((pos.y() - y_min) / pixel_size_y);
+
+        G4cout << "Just processed hit: i, j = " << i << ", " << j << G4endl;
 
         if (i < 0 || i >= fNx || j < 0 || j >= fNy) return false; // Out of bounds
 
         // Determine enregy bin
         G4int bin = static_cast<G4int>((edep-fEMin) / (fEMax-fEMin) * fNbins);
+
+        G4cout << "edep, fEmin, fEmax, fnBins: " << edep << ", " << fEMin << ", " << fEMax << ", " << fNbins << G4endl;
+        G4cout << "Just processed hit: bin = " << bin << G4endl;
+
         if (bin < 0 || bin >= fNbins) return false; // Out of bounds
 
         // Gen unique key for pixel and bin combination
@@ -51,7 +64,8 @@ namespace lircst {
         // Accumulate energy deposit in this pixel and bin
         fHitsMap->add(key, edep);
 
-        G4cout << "Just processed hit: energy " << fHitsMap->GetObject(key) << " at key " << key << G4endl;
+        G4cout << "Just processed hit: energy " << *(fHitsMap->GetObject(key)) << " at key " << key << G4endl;
+        G4cout << "(i, j, bin): " << i << ", " << j << ", " << bin << G4endl;
 
         return true;
     }

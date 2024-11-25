@@ -16,12 +16,12 @@ namespace lircst {
         void Initialize(G4HCofThisEvent* hce) override;
         G4bool ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) override;
 
-        const G4THitsMap<G4double>* GetHitsMap() const { return fHitsMap; }
+        G4THitsMap<G4double>* GetHitsMap() { return fHitsMap; }
 
     private:
         G4int fNx, fNy, fNbins;    // Pixel grid and energy bins
         G4double fEMin, fEMax;     // Energy range
-        const G4double x_min = Util::GetScorerSize() / 2, y_min = Util::GetScorerSize() / 2;
+        const G4double x_min = -(Util::GetScorerSize() / 2), y_min = -(Util::GetScorerSize() / 2);
         const G4double pixel_size_x = Util::GetScorerSize() / Util::GetNumPixelsX(), pixel_size_y = Util::GetScorerSize() / Util::GetNumPixelsY();
 
         G4THitsMap<G4double>* fHitsMap = nullptr;
