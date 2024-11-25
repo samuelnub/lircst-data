@@ -48,10 +48,12 @@ int main(int argc,char** argv) {
             delete ui;
         }
 
-        // Start a run
-        //int noOfEvents = 100;
-        //runManager->BeamOn(noOfEvents);
-        G4cout << "End of run tee hee" << G4endl;
+        if (argc == 1) {
+            // Start a run if not in vis ui session
+            int noOfEvents = 50;
+            runManager->BeamOn(noOfEvents);
+            G4cout << "End of run tee hee" << G4endl;
+        }
 
         // Terminate job
         delete visManager;

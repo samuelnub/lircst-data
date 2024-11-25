@@ -1,5 +1,10 @@
 #include "EnergySpectScorer.hh"
 #include "G4Step.hh"
+#include "G4ios.hh"
+
+#include "Util.hh"
+
+#include <typeinfo> // TODO: for debugging
 
 namespace lircst {
     EnergySpectScorer::EnergySpectScorer(G4String name, G4int nx, G4int ny, G4int nBins, G4double eMin, G4double eMax) : G4VPrimitiveScorer(name) {
@@ -15,15 +20,22 @@ namespace lircst {
         fHitsMap = new G4THitsMap<G4double>(GetMultiFunctionalDetector()->GetName(), GetName());
         G4int hcID = GetCollectionID(0);
         hce->AddHitsCollection(hcID, fHitsMap);
+
+        G4cout << "Initialized EnergySpectScorer " << typeid(fHitsMap).name() << G4endl;
     }
 
     G4bool EnergySpectScorer::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
+        G4cout << "About to process hits..." << G4endl;
+
         // Get energy deposited in this step
         G4double edep = aStep->GetTotalEnergyDeposit();
         if (edep == 0) return false;
 
         // Get pos of the step, and what pixel that corresponds to
-        G4ThreeVector pos = aStep->GetPreStepPoint()->GetPosition();
+        // Get local pos - local to touchable!
+        auto touchable = aStep->GetPreStepPoint()->GetTouchable();
+        G4ThreeVector worldPos = aStep->GetPreStepPoint()->GetPosition();
+        G4ThreeVector pos = touchable->GetHistory()->GetTopTransform().TransformPoint(worldPos);
         G4int i = static_cast<G4int>((pos.x() - x_min) / pixel_size_x);
         G4int j = static_cast<G4int>((pos.y() - y_min) / pixel_size_y);
 
@@ -34,10 +46,13 @@ namespace lircst {
         if (bin < 0 || bin >= fNbins) return false; // Out of bounds
 
         // Gen unique key for pixel and bin combination
-        G4int key = i + fNx * (j + fNy * bin);
+        G4int key = Util::GenMapKey(i, j, bin);
 
         // Accumulate energy deposit in this pixel and bin
         fHitsMap->add(key, edep);
+
+        G4cout << "Just processed hit: energy " << fHitsMap->GetObject(key) << " at key " << key << G4endl;
+
         return true;
     }
 }

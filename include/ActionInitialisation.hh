@@ -9,6 +9,7 @@ namespace lircst {
         ActionInitialisation() = default;
         ~ActionInitialisation() override = default;
 
+        void BuildForMaster() const override;
         void Build() const override;
     };
 }

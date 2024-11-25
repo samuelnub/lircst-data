@@ -2,8 +2,15 @@
 
 #include "PrimaryGeneratorAction.hh"
 
+#include "RunAction.hh"
+
 namespace lircst {
+    void ActionInitialisation::BuildForMaster() const {
+        SetUserAction(new RunAction);
+    }
+
     void ActionInitialisation::Build() const {
-        this->SetUserAction(new PrimaryGeneratorAction);
+        SetUserAction(new RunAction);
+        SetUserAction(new PrimaryGeneratorAction);
     }
 }

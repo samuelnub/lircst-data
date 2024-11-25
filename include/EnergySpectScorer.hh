@@ -5,6 +5,8 @@
 #include "G4THitsMap.hh"
 #include "G4SystemOfUnits.hh"
 
+#include "Util.hh"
+
 namespace lircst {
     class EnergySpectScorer : public G4VPrimitiveScorer {
     public:
@@ -13,13 +15,14 @@ namespace lircst {
 
         void Initialize(G4HCofThisEvent* hce) override;
         G4bool ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) override;
-        void EndOfEvent(G4HCofThisEvent* hce) override;
+
+        const G4THitsMap<G4double>* GetHitsMap() const { return fHitsMap; }
 
     private:
         G4int fNx, fNy, fNbins;    // Pixel grid and energy bins
         G4double fEMin, fEMax;     // Energy range
-        const G4double x_min = -50.0 * mm, y_min = -50.0 * mm;
-        const G4double pixel_size_x = 1.0 * mm, pixel_size_y = 1.0 * mm;
+        const G4double x_min = Util::GetScorerSize() / 2, y_min = Util::GetScorerSize() / 2;
+        const G4double pixel_size_x = Util::GetScorerSize() / Util::GetNumPixelsX(), pixel_size_y = Util::GetScorerSize() / Util::GetNumPixelsY();
 
         G4THitsMap<G4double>* fHitsMap = nullptr;
     };
