@@ -11,9 +11,9 @@ namespace lircst {
         EnergySpectScorer(G4String name, G4int nx, G4int ny, G4int nBins, G4double eMin, G4double eMax);
         ~EnergySpectScorer() override = default;
 
-        void Initialize(G4HCofThisEvent* HCE) override;
+        void Initialize(G4HCofThisEvent* hce) override;
         G4bool ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) override;
-        void EndOfEvent(G4HCofThisEvent* HCE) override;
+        void EndOfEvent(G4HCofThisEvent* hce) override;
 
     private:
         G4int fNx, fNy, fNbins;    // Pixel grid and energy bins

@@ -12,10 +12,9 @@ namespace lircst {
         ~DetectorConstruction() override = default;
 
         G4VPhysicalVolume* Construct() override;
-        
-        G4LogicalVolume* GetScoringVolume() const { return fScoringVolume; }
-
         void ConstructSDandField() override;
+
+        G4LogicalVolume* GetScoringVolume() const { return fScoringVolume; }
     protected:
         G4LogicalVolume* fScoringVolume = nullptr;
     };

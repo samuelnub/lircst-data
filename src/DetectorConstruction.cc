@@ -9,6 +9,8 @@
 #include "G4MultiFunctionalDetector.hh"
 #include "G4SDManager.hh"
 
+#include "EnergySpectScorer.hh"
+
 namespace lircst {
     G4VPhysicalVolume* DetectorConstruction::Construct() {
         // World
@@ -17,8 +19,14 @@ namespace lircst {
         auto worldLogical = new G4LogicalVolume(worldSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_AIR"), "World");
         auto worldPhysical = new G4PVPlacement(0, G4ThreeVector(), worldLogical, "World", 0, false, 0);
 
+        // TODO: Phantom
+
+
+        // Sensitive / Multi-func Detector & scoring volume geometries
+        auto scoringVolumeSize = 10.0 * cm;
+
         // Scoring volume
-        auto scoringVolumeSize = 3.0 * cm;
+        // TODO: This shouldn't be water, and this shouldn't be where the phantom should go
         auto scoringVolumeSolid = new G4Box("ScoringVolume", scoringVolumeSize / 2, scoringVolumeSize / 2, scoringVolumeSize / 2);
         fScoringVolume = new G4LogicalVolume(scoringVolumeSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_WATER"), "ScoringVolume");
         new G4PVPlacement(0, G4ThreeVector(), fScoringVolume, "ScoringVolume", worldLogical, false, 0);
@@ -27,10 +35,21 @@ namespace lircst {
         return worldPhysical;
     }
 
+
+
     void DetectorConstruction::ConstructSDandField() {
         // Setup MFD and Primitive Scorer(s)
         auto mfd = new G4MultiFunctionalDetector("mfd");
         G4SDManager::GetSDMpointer()->AddNewDetector(mfd);
-        // TOOD: Add primitive scorer(s)
+        // Add primitive scorer(s)
+        auto energySpectScorer = new EnergySpectScorer(
+                                                        "ess",
+                                                        256,
+                                                        256,
+                                                        100,
+                                                        0.0 * keV,
+                                                        100.0 * keV); // pretty low (medical)
+        mfd->RegisterPrimitive(energySpectScorer);
+        SetSensitiveDetector(fScoringVolume, mfd);
     }
 }

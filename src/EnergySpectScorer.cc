@@ -2,12 +2,19 @@
 #include "G4Step.hh"
 
 namespace lircst {
-    EnergySpectScorer::EnergySpectScorer(G4String name, G4int nx, G4int ny, G4int nBins, G4double eMin, G4double eMax) : G4VPrimitiveScorer(name, nx * ny) {
+    EnergySpectScorer::EnergySpectScorer(G4String name, G4int nx, G4int ny, G4int nBins, G4double eMin, G4double eMax) : G4VPrimitiveScorer(name) {
         fNx = nx;
         fNy = ny;
         fNbins = nBins;
         fEMin = eMin;
         fEMax = eMax;
+    }
+
+    void EnergySpectScorer::Initialize(G4HCofThisEvent* hce) {
+        // Code inspired from https://github.com/Geant4/geant4/blob/e58e650b32b961c8093f3dd6a2c3bc917b2552be/source/digits_hits/scorer/src/G4PSEnergyDeposit.cc
+        fHitsMap = new G4THitsMap<G4double>(GetMultiFunctionalDetector()->GetName(), GetName());
+        G4int hcID = GetCollectionID(0);
+        hce->AddHitsCollection(hcID, fHitsMap);
     }
 
     G4bool EnergySpectScorer::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
@@ -23,7 +30,14 @@ namespace lircst {
         if (i < 0 || i >= fNx || j < 0 || j >= fNy) return false; // Out of bounds
 
         // Determine enregy bin
-        
-        
+        G4int bin = static_cast<G4int>((edep-fEMin) / (fEMax-fEMin) * fNbins);
+        if (bin < 0 || bin >= fNbins) return false; // Out of bounds
+
+        // Gen unique key for pixel and bin combination
+        G4int key = i + fNx * (j + fNy * bin);
+
+        // Accumulate energy deposit in this pixel and bin
+        fHitsMap->add(key, edep);
+        return true;
     }
 }
