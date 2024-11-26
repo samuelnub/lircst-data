@@ -29,10 +29,7 @@ namespace lircst {
     G4bool EnergySpectScorer::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
         // Get energy deposited in this step
         G4double edep = aStep->GetTotalEnergyDeposit();
-        G4String overzero = "";
-        if (edep > 0) overzero = "(over zero)";
-        G4cout << "About to process hits, edep = " << edep << overzero << G4endl;
-        //if (edep == 0) return false; // TODO: debugging
+        if (edep == 0) return false;
 
         // Get pos of the step, and what pixel that corresponds to
         // Get local pos - local to touchable!
