@@ -24,9 +24,9 @@ namespace lircst {
         static const G4double GetScorerSize() { return fScorerSize; }
 
     private:
-        static const G4int fNumPixelsX = 16; // TODO: tiny for testing
-        static const G4int fNumPixelsY = 16;
-        static const G4int fNumBins = 8;
+        static const G4int fNumPixelsX = 256;
+        static const G4int fNumPixelsY = 256;
+        static const G4int fNumBins = 100;
         static constexpr G4double fEnergyMin = 0.0 * keV;
         static constexpr G4double fEnergyMax = 100.0 * keV;
         static constexpr G4double fScorerSize = 10.0 * cm; // Make sure that each pixel is roughly 1mm x 1mm

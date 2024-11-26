@@ -10,8 +10,6 @@
 
 #include "EnergySpectScorer.hh"
 
-#include <typeinfo> // TODO: for debugging
-
 namespace lircst {
     RunAction::RunAction() : G4UserRunAction() {
         G4AccumulableManager::Instance()->RegisterAccumulable(&fAccumulatedHitsMap);
@@ -20,15 +18,15 @@ namespace lircst {
 
     void RunAction::BeginOfRunAction(const G4Run* run) {
         if (IsMaster()) {
-            //G4AccumulableManager::Instance()->Reset();
-
-            G4cout << "Begin of global run action: //noJust reset accumulable" << G4endl;
+            // P.S. If you do multiple runs per session, we will accumulate over all runs
+            G4cout << "Begin of global run action" << G4endl;
         }
     }
 
     void RunAction::EndOfRunAction(const G4Run* run) {
         auto nofEvents = run->GetNumberOfEvent();
 
+        // Merge thread-local accumulables to one
         auto accumulableManager = G4AccumulableManager::Instance();
         accumulableManager->Merge();
 
@@ -37,7 +35,6 @@ namespace lircst {
             G4cout << "End of global run... about to see how our data is like" << G4endl;
 
             // Save to final reading after master run
-            // Merge thread-local accumulables to one
             const auto& finalAccumulableMap = static_cast<AccumulableMap*>(accumulableManager->GetAccumulable("AccumulatedHitsMap"));
             auto finalMap = finalAccumulableMap->GetMap();
 
@@ -70,9 +67,7 @@ namespace lircst {
         for (auto iter = hitsMap->GetMap()->begin(); iter != hitsMap->GetMap()->end(); iter++) {
             G4int key = iter->first;
             G4double value = *(iter->second);
-            G4cout << "In RunAction AddHitsMap(): key, value = " << key << ", " << value << G4endl;
             fAccumulatedHitsMap.AddValue(key, value);
-            G4cout << "Current size of accumulated hits map: " << fAccumulatedHitsMap.GetMap().size() << G4endl;
         }
     }
 }
