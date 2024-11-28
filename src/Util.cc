@@ -1,7 +1,7 @@
 #include "Util.hh"
 
 #include <vector>
-#include <fstream>
+#include <ctime>
 
 #include "BMPMini.hh"
 
@@ -17,8 +17,11 @@ namespace lircst {
         return fEnergyMin + (fEnergyMax - fEnergyMin) / fNumBins * bin;
     }
 
-    G4bool Util::ExportData(AccumulableMap<G4int> data, G4String filename) {
+    G4bool Util::ExportData(AccumulableMap<G4int> data, G4String filename = "") {
         G4String folder = "output/";
+        if (filename == "") {
+            filename = to_string(time(0)); // Not a guarantee for unix timestamps, but good enough for our purposes
+        }
         G4String imgExtention = ".bmp";
         
         std::map<G4int,G4int> map = data.GetMap();

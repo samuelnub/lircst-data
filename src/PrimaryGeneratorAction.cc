@@ -3,6 +3,8 @@
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
 
+#include "Util.hh"
+
 namespace lircst {
     PrimaryGeneratorAction::PrimaryGeneratorAction() : G4VUserPrimaryGeneratorAction() {
         
@@ -21,12 +23,12 @@ namespace lircst {
     void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
         // Set particle pos / dir
         // We'll have a parallel beam
-        G4double beamWidth = 5.0 * cm;
-        G4double beamHeight = 5.0 * cm;
+        G4double beamWidth = Util::GetScorerSize() / 2;
+        G4double beamHeight = Util::GetScorerSize() / 2;
         G4double x = G4UniformRand() * beamWidth - beamWidth / 2;
         G4double y = G4UniformRand() * beamHeight - beamHeight / 2;
 
-        this->fParticleGun->SetParticlePosition(G4ThreeVector(x, y, -10.0 * cm));
+        this->fParticleGun->SetParticlePosition(G4ThreeVector(x, y, -(Util::GetWorldSize() * 0.8)));
         this->fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0, 0, 1));
 
         this->fParticleGun->GeneratePrimaryVertex(anEvent);
