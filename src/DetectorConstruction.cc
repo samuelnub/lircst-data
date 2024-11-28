@@ -47,9 +47,9 @@ namespace lircst {
 
         auto scoringVolumeDistFromCentre = worldSize * 0.8;
         auto scoringVolumeRotation = new G4RotationMatrix();
-        scoringVolumeRotation->rotateX(180 * deg); // Face down
+        scoringVolumeRotation->rotateX(90 * deg); // Face down
 
-        auto scoringVolumeSolid = new G4Box("ScoringVolume", scoringVolumeSize, scoringVolumeSize / 8, scoringVolumeSize);
+        auto scoringVolumeSolid = new G4Box("ScoringVolume", scoringVolumeSize, scoringVolumeSize, scoringVolumeSize / 8);
         fScoringVolume = new G4LogicalVolume(scoringVolumeSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_Pb"), "ScoringVolume");
         new G4PVPlacement(scoringVolumeRotation, G4ThreeVector(0, scoringVolumeDistFromCentre, 0), fScoringVolume, "ScoringVolume", worldLogical, false, 0);
 
