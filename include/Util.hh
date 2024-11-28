@@ -14,7 +14,9 @@ namespace lircst {
     public:
         static G4int GenMapKey(G4int x, G4int y, G4int bin);
 
-        static G4bool exportData(vector<vector<vector<G4double>>> data, G4String filename);
+        static G4double BinToEnergy(G4int bin);
+
+        static G4bool ExportData(vector<vector<vector<G4double>>> data, G4String filename);
 
         static const G4int GetNumPixelsX() { return fNumPixelsX; } 
         static const G4int GetNumPixelsY() { return fNumPixelsY; }

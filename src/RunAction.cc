@@ -35,7 +35,7 @@ namespace lircst {
             G4cout << "End of global run... about to see how our data is like" << G4endl;
 
             // Save to final reading after master run
-            const auto& finalAccumulableMap = static_cast<AccumulableMap*>(accumulableManager->GetAccumulable("AccumulatedHitsMap"));
+            const auto& finalAccumulableMap = static_cast<AccumulableMap<G4int>*>(accumulableManager->GetAccumulable("AccumulatedHitsMap"));
             auto finalMap = finalAccumulableMap->GetMap();
 
             G4cout << "Final Hits Map Size: " << finalMap.size() << G4endl;
@@ -66,8 +66,9 @@ namespace lircst {
     void RunAction::AddHitsMap(G4THitsMap<G4double>* hitsMap) {
         for (auto iter = hitsMap->GetMap()->begin(); iter != hitsMap->GetMap()->end(); iter++) {
             G4int key = iter->first;
-            G4double value = *(iter->second);
-            fAccumulatedHitsMap.AddValue(key, value);
+            // G4double value = *(iter->second);
+            // We just count photons
+            fAccumulatedHitsMap.AddValue(key, 1);
         }
     }
 }

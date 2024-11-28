@@ -10,7 +10,9 @@ namespace lircst {
         return x + fNumPixelsY * (y + fNumPixelsY * bin);
     }
 
-    G4bool Util::exportData(vector<vector<vector<G4double>>> data, G4String filename) {
+
+
+    G4bool Util::ExportData(vector<vector<vector<G4double>>> data, G4String filename) {
         // TODO: this was auto gen lol
 
         ofstream file;

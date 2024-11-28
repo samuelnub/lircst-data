@@ -17,7 +17,7 @@ namespace lircst {
         void AddHitsMap(G4THitsMap<G4double>* hitsMap);
 
     private:
-        AccumulableMap fAccumulatedHitsMap = AccumulableMap("AccumulatedHitsMap");
+        AccumulableMap<G4int> fAccumulatedHitsMap = AccumulableMap<G4int>("AccumulatedHitsMap");
     };
 }
 

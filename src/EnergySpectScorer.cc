@@ -43,8 +43,7 @@ namespace lircst {
         G4int key = Util::GenMapKey(i, j, bin);
 
         // Accumulate energy deposit in this pixel and bin
-        G4double increment = 1.0f;
-        fHitsMap->add(key, increment); 
+        fHitsMap->add(key, edep); // P.S. Eventually, when aggregating, we just care about photon count
 
         G4cout << "(i, j, bin, key, edep): " << i << ", " << j << ", " << bin << ", " << key << ", " << edep << G4endl;
 
