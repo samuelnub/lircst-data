@@ -40,12 +40,8 @@ namespace lircst {
 
             G4cout << "Final Hits Map Size: " << finalMap.size() << G4endl;
 
-            for (const auto& entry : finalMap) {
-                G4int index = entry.first;
-                G4double value = entry.second;
-
-                G4cout << "Index: " << index << ", Accumulated Value: " << value << G4endl;
-            }
+            // Export data
+            Util::ExportData(*finalAccumulableMap, "output.out");
 
             G4cout
             << G4endl

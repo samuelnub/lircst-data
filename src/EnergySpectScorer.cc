@@ -22,13 +22,13 @@ namespace lircst {
 
     G4bool EnergySpectScorer::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
         // Get energy deposited in this step
-        G4double edep = aStep->GetTotalEnergyDeposit();
-        if (edep == 0) return false;
+        G4double energy = aStep->GetPreStepPoint()->GetKineticEnergy();
+        if (energy == 0) return false;
 
         // Get pos of the step, and what pixel that corresponds to
         // Get local pos - local to touchable!
-        auto touchable = aStep->GetPostStepPoint()->GetTouchable();
-        G4ThreeVector worldPos = aStep->GetPostStepPoint()->GetPosition();
+        auto touchable = aStep->GetPreStepPoint()->GetTouchable();
+        G4ThreeVector worldPos = aStep->GetPreStepPoint()->GetPosition();
         G4ThreeVector pos = touchable->GetHistory()->GetTopTransform().TransformPoint(worldPos);
 
         G4int i = static_cast<G4int>((pos.x() - x_min) / pixel_size_x);
@@ -36,16 +36,16 @@ namespace lircst {
         if (i < 0 || i >= fNx || j < 0 || j >= fNy) return false; // Out of bounds
 
         // Determine enregy bin
-        G4int bin = static_cast<G4int>((edep-fEMin) / (fEMax-fEMin) * fNbins);
+        G4int bin = static_cast<G4int>((energy-fEMin) / (fEMax-fEMin) * fNbins);
         if (bin < 0 || bin >= fNbins) return false; // Out of bounds
 
         // Gen unique key for pixel and bin combination
         G4int key = Util::GenMapKey(i, j, bin);
 
         // Accumulate energy deposit in this pixel and bin
-        fHitsMap->add(key, edep); // P.S. Eventually, when aggregating, we just care about photon count
+        fHitsMap->add(key, energy); // P.S. Eventually, when aggregating, we just care about photon count
 
-        G4cout << "(i, j, bin, key, edep): " << i << ", " << j << ", " << bin << ", " << key << ", " << edep << G4endl;
+        G4cout << "(i, j, bin, key, edep): " << i << ", " << j << ", " << bin << ", " << key << ", " << energy << G4endl;
 
         return true;
     }

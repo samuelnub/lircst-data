@@ -7,16 +7,20 @@
 #include "G4String.hh"
 #include "G4SystemOfUnits.hh"
 
+#include "AccumulableMap.hh"
+
 using namespace std;
 
 namespace lircst {
+    template class AccumulableMap<G4int>;
+
     class Util {
     public:
         static G4int GenMapKey(G4int x, G4int y, G4int bin);
 
         static G4double BinToEnergy(G4int bin);
 
-        static G4bool ExportData(vector<vector<vector<G4double>>> data, G4String filename);
+        static G4bool ExportData(AccumulableMap<G4int> data, G4String filename);
 
         static const G4int GetNumPixelsX() { return fNumPixelsX; } 
         static const G4int GetNumPixelsY() { return fNumPixelsY; }
