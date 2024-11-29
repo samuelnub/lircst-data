@@ -28,7 +28,6 @@ namespace lircst {
         if (!hitsMap) return;
 
         // So cursed
-        G4cout << "In EventAction: HitsMap size: " << hitsMap->entries() << G4endl;
         auto runAction = static_cast<RunAction*>(const_cast<G4UserRunAction*>(G4RunManager::GetRunManager()->GetUserRunAction()));
         runAction->AddHitsMap(hitsMap);
     }

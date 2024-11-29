@@ -34,9 +34,9 @@ int main(int argc,char** argv) {
         // UI manager pointer
         auto uiManager = G4UImanager::GetUIpointer();
         // Set verbosities for UI
-        uiManager->ApplyCommand("/run/verbose 1");
-        uiManager->ApplyCommand("/event/verbose 1");
-        uiManager->ApplyCommand("/tracking/verbose 1");
+        uiManager->ApplyCommand("/run/verbose 0");
+        uiManager->ApplyCommand("/event/verbose 0");
+        uiManager->ApplyCommand("/tracking/verbose 0");
 
         if (argc > 1) {
             // Assume it's a vis ui session
@@ -50,7 +50,7 @@ int main(int argc,char** argv) {
 
         if (argc == 1) {
             // Start a run if not in vis ui session
-            int noOfEvents = 100000;
+            int noOfEvents = 10000000;
             runManager->BeamOn(noOfEvents);
             G4cout << "End of run tee hee" << G4endl;
         }
