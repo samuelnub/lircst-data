@@ -25,6 +25,17 @@ namespace lircst {
         G4double energy = aStep->GetPreStepPoint()->GetKineticEnergy();
         if (energy == 0) return false;
 
+        // TODO: collimate by checking momentum direction
+        G4double collSDToIncidentRatio = 0.5;
+        G4ThreeVector SDPosition = G4ThreeVector(0, Util::GetWorldSize() * Util::GetGunSDRatio(), 0);        
+        G4ThreeVector momentumDirection = aStep->GetPreStepPoint()->GetMomentumDirection();
+        G4ThreeVector incidentIntersection = G4ThreeVector(0,0,0); // With our setup, the intersection point is the centre of our world
+        G4ThreeVector pinholePosition = collSDToIncidentRatio * (SDPosition + incidentIntersection);
+        G4double pinholeTolerance = std::cos(5 * deg);
+        G4ThreeVector expectedDirection = (pinholePosition - aStep->GetPreStepPoint()->GetPosition()).unit();
+        G4double alignment = std::abs(expectedDirection.dot(momentumDirection));
+        if (alignment < pinholeTolerance) return false;
+
         // Get pos of the step, and what pixel that corresponds to
         // Get local pos - local to touchable!
         auto touchable = aStep->GetPreStepPoint()->GetTouchable();

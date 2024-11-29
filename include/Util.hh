@@ -30,6 +30,7 @@ namespace lircst {
         static const G4double GetScorerSize() { return fScorerSize; }
         static const G4double GetWorldSize() { return fWorldSize; }
         static const G4double GetPhantomSize() { return fPhantomSize; }
+        static const G4double GetGunSDRatio() { return fGunSDRatio; }
 
     private:
         static const G4int fNumPixelsX = 256;
@@ -37,9 +38,10 @@ namespace lircst {
         static const G4int fNumBins = 100;
         static constexpr G4double fEnergyMin = 0.0 * keV;
         static constexpr G4double fEnergyMax = 100.0 * keV;
-        static constexpr G4double fScorerSize = 10.0 * cm; // Make sure that each pixel is roughly 1mm x 1mm
-        static constexpr G4double fWorldSize = 40.0 * cm;
-        static constexpr G4double fPhantomSize = 20.0 * cm;
+        static constexpr G4double fScorerSize = 20.0 * cm; // Make sure that each pixel is roughly 1mm x 1mm
+        static constexpr G4double fWorldSize = 50.0 * cm;
+        static constexpr G4double fPhantomSize = 10.0 * cm;
+        static constexpr G4double fGunSDRatio = 0.9;
     };
 }
 

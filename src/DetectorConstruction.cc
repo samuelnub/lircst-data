@@ -45,7 +45,7 @@ namespace lircst {
         // Sensitive / Multi-func Detector & scoring volume geometries
         auto scoringVolumeSize = Util::GetScorerSize();
 
-        auto scoringVolumeDistFromCentre = worldSize * 0.8;
+        auto scoringVolumeDistFromCentre = worldSize * Util::GetGunSDRatio();
         auto scoringVolumeRotation = new G4RotationMatrix();
         scoringVolumeRotation->rotateX(-90 * deg); // Face down
 

@@ -25,10 +25,11 @@ namespace lircst {
         // We'll have a parallel beam
         G4double beamWidth = Util::GetScorerSize() / 2;
         G4double beamHeight = Util::GetScorerSize() / 2;
-        G4double x = G4UniformRand() * beamWidth - beamWidth / 2;
-        G4double y = G4UniformRand() * beamHeight - beamHeight / 2;
+        G4double x = 0; // G4UniformRand() * beamWidth - beamWidth / 2;
+        G4double y = 0; // G4UniformRand() * beamHeight - beamHeight / 2;
+        // ^^^ Pencil beam
 
-        this->fParticleGun->SetParticlePosition(G4ThreeVector(x, y, -(Util::GetWorldSize() * 0.8)));
+        this->fParticleGun->SetParticlePosition(G4ThreeVector(x, y, -(Util::GetWorldSize() * Util::GetGunSDRatio())));
         this->fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0, 0, 1));
 
         this->fParticleGun->GeneratePrimaryVertex(anEvent);
