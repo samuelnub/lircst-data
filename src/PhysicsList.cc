@@ -22,7 +22,6 @@ namespace lircst {
         auto physicsHelper = G4PhysicsListHelper::GetPhysicsListHelper();
         
         auto particle = G4Gamma::GammaDefinition();
-
         physicsHelper->RegisterProcess(new G4PhotoElectricEffect, particle);
         physicsHelper->RegisterProcess(new G4ComptonScattering, particle);
         physicsHelper->RegisterProcess(new G4GammaConversion, particle);

@@ -12,8 +12,7 @@ namespace lircst {
         this->fParticleGun = new G4ParticleGun(noOfParticles);
 
         // Set particle properties
-        G4double particleEnergy = 60.0 * keV; // 60 keV seems reasonable to see the Compton effect take place
-
+        G4double particleEnergy = Util::GetGunEnergy();
         this->fParticleGun->SetParticleDefinition(G4Gamma::GammaDefinition());
         this->fParticleGun->SetParticleEnergy(particleEnergy);
 
@@ -23,11 +22,10 @@ namespace lircst {
     void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
         // Set particle pos / dir
         // We'll have a parallel beam
-        G4double beamWidth = Util::GetScorerSize() / 2;
-        G4double beamHeight = Util::GetScorerSize() / 2;
+        G4double beamWidth = Util::GetPhantomSize();
+        G4double beamHeight = Util::GetPhantomSize();
         G4double x = 0; // G4UniformRand() * beamWidth - beamWidth / 2;
         G4double y = 0; // G4UniformRand() * beamHeight - beamHeight / 2;
-        // ^^^ Pencil beam
 
         this->fParticleGun->SetParticlePosition(G4ThreeVector(x, y, -(Util::GetWorldSize() * Util::GetGunSDRatio())));
         this->fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0, 0, 1));

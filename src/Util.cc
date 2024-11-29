@@ -55,7 +55,8 @@ namespace lircst {
                     totalEnergy += BinToEnergy(k) * unpackedData[i][j][k];
                 }
                 G4double one = 1.0;
-                uint8_t pixelValue = static_cast<uint8_t>(min(totalEnergy / fEnergyMax, one) * 255);
+                G4double maxEnergy = fEnergyMax * 2; // Arbitrary scaling factor to allow accumulated photons to shine through
+                uint8_t pixelValue = static_cast<uint8_t>(min(totalEnergy / maxEnergy, one) * 255);
                 if (pixelValue > 0) {
                     G4cout << "Pixel value at i, j, and totalEnergy: " << i << ", " << j << " is " << static_cast<G4int>(pixelValue) << " and " << totalEnergy << G4endl;
                 }

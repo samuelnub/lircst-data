@@ -25,7 +25,7 @@ namespace lircst {
         G4double energy = aStep->GetPreStepPoint()->GetKineticEnergy();
         if (energy == 0) return false;
 
-        // TODO: collimate by checking momentum direction
+        // Collimation
         G4double collSDToIncidentRatio = 0.5;
         G4ThreeVector SDPosition = G4ThreeVector(0, Util::GetWorldSize() * Util::GetGunSDRatio(), 0);        
         G4ThreeVector momentumDirection = aStep->GetPreStepPoint()->GetMomentumDirection();
@@ -55,8 +55,6 @@ namespace lircst {
 
         // Accumulate energy deposit in this pixel and bin
         fHitsMap->add(key, energy); // P.S. Eventually, when aggregating, we just care about photon count
-
-        G4cout << "(i, j, bin, key, edep): " << i << ", " << j << ", " << bin << ", " << key << ", " << energy << G4endl;
 
         return true;
     }

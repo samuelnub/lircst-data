@@ -25,6 +25,7 @@ namespace lircst {
         static const G4int GetNumPixelsX() { return fNumPixelsX; } 
         static const G4int GetNumPixelsY() { return fNumPixelsY; }
         static const G4int GetNumBins() { return fNumBins; }
+        static const G4double GetGunEnergy() { return fGunEnergy; }
         static const G4double GetEnergyMin() { return fEnergyMin; }
         static const G4double GetEnergyMax() { return fEnergyMax; }
         static const G4double GetScorerSize() { return fScorerSize; }
@@ -36,6 +37,7 @@ namespace lircst {
         static const G4int fNumPixelsX = 256;
         static const G4int fNumPixelsY = 256;
         static const G4int fNumBins = 100;
+        static constexpr G4double fGunEnergy = 60.0 * keV;
         static constexpr G4double fEnergyMin = 0.0 * keV;
         static constexpr G4double fEnergyMax = 100.0 * keV;
         static constexpr G4double fScorerSize = 20.0 * cm; // Make sure that each pixel is roughly 1mm x 1mm
