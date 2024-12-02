@@ -40,8 +40,8 @@ namespace lircst {
         static constexpr G4double fGunEnergy = 60.0 * keV;
         static constexpr G4double fEnergyMin = 0.0 * keV;
         static constexpr G4double fEnergyMax = 100.0 * keV;
-        static constexpr G4double fScorerSize = 20.0 * cm; // Make sure that each pixel is roughly 1mm x 1mm
-        static constexpr G4double fWorldSize = 50.0 * cm;
+        static constexpr G4double fScorerSize = 10.0 * cm; // Make sure that each pixel is roughly 1mm x 1mm
+        static constexpr G4double fWorldSize = 30.0 * cm;
         static constexpr G4double fPhantomSize = 10.0 * cm;
         static constexpr G4double fGunSDRatio = 0.9;
     };
