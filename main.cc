@@ -9,19 +9,8 @@
 #include "DetectorConstruction.hh"
 #include "ActionInitialisation.hh"
 
-#include <accel/AlongStepFactory.hh>
-#include <accel/LocalTransporter.hh>
-#include <accel/SetupOptions.hh>
-#include <accel/SharedParams.hh>
-#include <accel/SimpleOffload.hh>
-#include <accel/TrackingManagerOffload.hh>
-#include <corecel/Macros.hh>
-#include <corecel/io/Logger.hh>
-
-namespace lircst {
-
-}
-
+#include "G4FastSimulationPhysics.hh"
+#include "CeleritasGlobals.hh"
 
 using namespace lircst;
 
@@ -36,8 +25,22 @@ int main(int argc,char** argv) {
 
         // Set must-have user init classes
         runManager->SetUserInitialization(new DetectorConstruction);
-        runManager->SetUserInitialization(new PhysicsList);
+
+        // Celeritas physics for FastSimulationPhysics
+        auto physicsList = new PhysicsList();
+        auto fastPhysics = new G4FastSimulationPhysics();
+        fastPhysics->ActivateFastSimulation("e-");
+        fastPhysics->ActivateFastSimulation("e+");
+        fastPhysics->ActivateFastSimulation("gamma");
+        physicsList->RegisterPhysics(fastPhysics);
+        runManager->SetUserInitialization(physicsList);
+
         runManager->SetUserInitialization(new ActionInitialisation);
+
+        // Celeritas options
+        CeleritasGlobals::setup_options.max_num_tracks = 1024;
+        CeleritasGlobals::setup_options.initializer_capacity = 1024 * 128;
+
 
         // Init G4 kernel
         runManager->Initialize();
@@ -64,7 +67,7 @@ int main(int argc,char** argv) {
 
         if (argc == 1) {
             // Start a run if not in vis ui session
-            int noOfEvents = 1000000000; // 1 Billion
+            int noOfEvents = 10000000; // 1 Billion 10 mil actually lol
             runManager->BeamOn(noOfEvents);
             G4cout << "End of run tee hee" << G4endl;
         }

@@ -10,6 +10,8 @@
 
 #include "EnergySpectScorer.hh"
 
+#include "CeleritasGlobals.hh"
+
 namespace lircst {
     RunAction::RunAction() : G4UserRunAction() {
         G4AccumulableManager::Instance()->RegisterAccumulable(&fAccumulatedHitsMap);
@@ -17,6 +19,9 @@ namespace lircst {
     }
 
     void RunAction::BeginOfRunAction(const G4Run* run) {
+        // Celeritas
+        CeleritasGlobals::simple_offload.BeginOfRunAction(run);
+
         if (IsMaster()) {
             // P.S. If you do multiple runs per session, we will accumulate over all runs
             G4cout << "Begin of global run action" << G4endl;
@@ -57,6 +62,9 @@ namespace lircst {
             << G4endl
             << "  The run was " << nofEvents << " events" << G4endl;
         }
+
+        // Celeritas
+        CeleritasGlobals::simple_offload.EndOfRunAction(run);
     }
 
     void RunAction::AddHitsMap(G4THitsMap<G4double>* hitsMap) {

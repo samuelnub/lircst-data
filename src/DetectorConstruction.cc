@@ -9,12 +9,21 @@
 #include "Randomize.hh"
 #include "G4MultiFunctionalDetector.hh"
 #include "G4SDManager.hh"
+#include "G4RegionStore.hh"
 
 #include "EnergySpectScorer.hh"
 
 #include "Util.hh"
 
+#include "CeleritasGlobals.hh"
+#include <accel/FastSimulationOffload.hh>
+#include <accel/SetupOptions.hh>
+
 namespace lircst {
+    DetectorConstruction::DetectorConstruction() : G4VUserDetectorConstruction() {
+        CeleritasGlobals::setup_options.make_along_step = celeritas::UniformAlongStepFactory();
+    }
+
     G4VPhysicalVolume* DetectorConstruction::Construct() {
         // World
         auto worldSize = Util::GetWorldSize();
@@ -56,6 +65,15 @@ namespace lircst {
                                                         Util::GetEnergyMax()); // pretty low (medical)
         mfd->RegisterPrimitive(energySpectScorer);
         SetSensitiveDetector(fScoringVolume, mfd);
+
+        // Celeritas
+        G4Region* defaultRegion = G4RegionStore::GetInstance()->GetRegion("DefaultRegionForTheWorld");
+        new celeritas::FastSimulationOffload(
+            "accel::FastSimulationOffload",
+            defaultRegion,
+            &CeleritasGlobals::shared_params,
+            &CeleritasGlobals::local_transporter
+        );
     }
 
     void DetectorConstruction::ConstructPhanRandom() {

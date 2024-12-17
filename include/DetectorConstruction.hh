@@ -8,7 +8,7 @@ class G4LogicalVolume;
 namespace lircst {
     class DetectorConstruction : public G4VUserDetectorConstruction {
     public:
-        DetectorConstruction() = default;
+        DetectorConstruction();
         ~DetectorConstruction() override = default;
 
         G4VPhysicalVolume* Construct() override;
