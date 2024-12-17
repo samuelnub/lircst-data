@@ -50,7 +50,7 @@ int main(int argc,char** argv) {
 
         if (argc == 1) {
             // Start a run if not in vis ui session
-            int noOfEvents = 10000000;
+            int noOfEvents = 1000000000; // 1 Billion
             runManager->BeamOn(noOfEvents);
             G4cout << "End of run tee hee" << G4endl;
         }

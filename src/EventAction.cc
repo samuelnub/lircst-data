@@ -14,7 +14,7 @@ namespace lircst {
 
     void EventAction::EndOfEventAction(const G4Event* event) {
         // Just some logging
-        if (event->GetEventID() % 1000 == 0) {
+        if (event->GetEventID() % 1000000 == 0) {
             G4cout << "Event " << event->GetEventID() << " done" << G4endl;
         }
 
