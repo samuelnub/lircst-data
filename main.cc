@@ -9,6 +9,20 @@
 #include "DetectorConstruction.hh"
 #include "ActionInitialisation.hh"
 
+#include <accel/AlongStepFactory.hh>
+#include <accel/LocalTransporter.hh>
+#include <accel/SetupOptions.hh>
+#include <accel/SharedParams.hh>
+#include <accel/SimpleOffload.hh>
+#include <accel/TrackingManagerOffload.hh>
+#include <corecel/Macros.hh>
+#include <corecel/io/Logger.hh>
+
+namespace lircst {
+
+}
+
+
 using namespace lircst;
 
 // Based on https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/GettingStarted/mainProgram.html
