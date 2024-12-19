@@ -22,6 +22,7 @@ int main(int argc,char** argv) {
 
         // Default run manager - manages flow of program, and event loop(s) in a run
         auto runManager = G4RunManagerFactory::CreateRunManager();
+        runManager->SetNumberOfThreads(64);
 
         // Set must-have user init classes
         runManager->SetUserInitialization(new DetectorConstruction);
