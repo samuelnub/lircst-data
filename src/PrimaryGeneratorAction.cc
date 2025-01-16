@@ -27,7 +27,7 @@ namespace lircst {
         G4double x =  G4UniformRand() * beamWidth - beamWidth / 2;
         G4double y =  0; // G4UniformRand() * beamHeight - beamHeight / 2;
 
-        this->fParticleGun->SetParticlePosition(G4ThreeVector(x, y, -(Util::GetWorldSize() * Util::GetGunSDRatio())));
+        this->fParticleGun->SetParticlePosition(G4ThreeVector(x, y, -(Util::GetWorldSize() * Util::GetWorldGunSDRatio())));
         this->fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0, 0, 1));
 
         this->fParticleGun->GeneratePrimaryVertex(anEvent);

@@ -26,11 +26,10 @@ namespace lircst {
         if (energy == 0) return false;
 
         // Collimation
-        G4double collSDToIncidentRatio = 0.65;
-        G4ThreeVector SDPosition = G4ThreeVector(0, Util::GetWorldSize() * Util::GetGunSDRatio(), 0);        
+        G4ThreeVector SDPosition = G4ThreeVector(0, Util::GetWorldSize() * Util::GetWorldGunSDRatio(), 0);        
         G4ThreeVector momentumDirection = aStep->GetPreStepPoint()->GetMomentumDirection();
         G4ThreeVector incidentIntersection = G4ThreeVector(0,0,0); // With our setup, the intersection point is the centre of our world
-        G4ThreeVector pinholePosition = collSDToIncidentRatio * (SDPosition + incidentIntersection);
+        G4ThreeVector pinholePosition = Util::GetCollSDToIncidentRatio() * (SDPosition + incidentIntersection);
         G4double pinholeTolerance = std::cos(1 * deg);
         G4ThreeVector expectedDirection = (pinholePosition - aStep->GetPreStepPoint()->GetPosition()).unit();
         G4double alignment = std::abs(expectedDirection.dot(momentumDirection));

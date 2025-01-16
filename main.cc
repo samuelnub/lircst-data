@@ -4,13 +4,13 @@
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
 #include "G4ios.hh"
+#include "G4GeometrySampler.hh"
+#include "G4ImportanceBiasing.hh"
+#include "G4GeometryManager.hh"
 
 #include "PhysicsList.hh"
 #include "DetectorConstruction.hh"
 #include "ActionInitialisation.hh"
-
-#include "G4FastSimulationPhysics.hh"
-#include "CeleritasGlobals.hh"
 
 using namespace lircst;
 
@@ -22,29 +22,23 @@ int main(int argc,char** argv) {
 
         // Default run manager - manages flow of program, and event loop(s) in a run
         auto runManager = G4RunManagerFactory::CreateRunManager();
-        runManager->SetNumberOfThreads(64);
+        // runManager->SetNumberOfThreads(256);
 
         // Set must-have user init classes
-        runManager->SetUserInitialization(new DetectorConstruction);
-
-        // Celeritas physics for FastSimulationPhysics
-        auto physicsList = new PhysicsList();
-        auto fastPhysics = new G4FastSimulationPhysics();
-        fastPhysics->ActivateFastSimulation("e-");
-        fastPhysics->ActivateFastSimulation("e+");
-        fastPhysics->ActivateFastSimulation("gamma");
-        physicsList->RegisterPhysics(fastPhysics);
-        runManager->SetUserInitialization(physicsList);
-
+        auto detector = new DetectorConstruction();
+        runManager->SetUserInitialization(detector);
+        // For importance biasing
+        G4GeometrySampler geomSampler(detector->GetWorldVolume(), "gamma");
+        auto physList = new PhysicsList();
+        physList->RegisterPhysics(new G4ImportanceBiasing(&geomSampler));
+        runManager->SetUserInitialization(physList);
         runManager->SetUserInitialization(new ActionInitialisation);
-
-        // Celeritas options
-        CeleritasGlobals::setup_options.max_num_tracks = 1024;
-        CeleritasGlobals::setup_options.initializer_capacity = 1024 * 128;
-
 
         // Init G4 kernel
         runManager->Initialize();
+
+        // For importance biasing
+        detector->CreateImportanceStore();
 
         auto visManager = new G4VisExecutive(argc, argv);
         visManager->Initialize();
@@ -68,10 +62,13 @@ int main(int argc,char** argv) {
 
         if (argc == 1) {
             // Start a run if not in vis ui session
-            int noOfEvents = 10000000; // 1 Billion 10 mil actually lol
+            int noOfEvents = 10000000; // 10 teeny tiny mil
             runManager->BeamOn(noOfEvents);
             G4cout << "End of run tee hee" << G4endl;
         }
+
+        // For importance biasing clean-up
+        G4GeometryManager::GetInstance()->OpenGeometry();
 
         // Terminate job
         delete visManager;
