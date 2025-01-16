@@ -1,10 +1,10 @@
 #ifndef PHYSICSLIST_HH
 #define PHYSICSLIST_HH
 
-#include "G4VUserPhysicsList.hh"
+#include "G4VModularPhysicsList.hh"
 
 namespace lircst {
-    class PhysicsList : public G4VUserPhysicsList {
+    class PhysicsList : public G4VModularPhysicsList {
     public:
         PhysicsList() = default;
         ~PhysicsList() override = default;

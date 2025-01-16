@@ -1,7 +1,13 @@
 #ifndef DETECTORCONSTRUCTION_HH
 #define DETECTORCONSTRUCTION_HH
 
+#include <vector>
+
 #include "G4VUserDetectorConstruction.hh"
+
+// For importance biasing
+#include "G4VIStore.hh"
+#include "G4IStore.hh"
 
 class G4LogicalVolume;
 
@@ -14,16 +20,22 @@ namespace lircst {
         G4VPhysicalVolume* Construct() override;
         void ConstructSDandField() override;
 
-        G4LogicalVolume* GetScoringVolume() const { return fScoringVolume; }
+        G4VPhysicalVolume* GetWorldVolume() const { return fPhysicalWorldVolume; }
+        G4LogicalVolume* GetScoringVolume() const { return fLogicalScoringVolume; }
+
+        void ConstructImportanceVolumes();
+        G4VIStore* CreateImportanceStore(); // Caller is responsible for deletion
 
         // Some different phantom options to construct
-        void ConstructPhanRandom();
-        void ConstructPhanLungTumour();
-        void ConstructPhanTubes();
+        G4VPhysicalVolume* ConstructPhanRandom();
+        G4VPhysicalVolume* ConstructPhanLungTumour();
+        G4VPhysicalVolume* ConstructPhanTubes();
 
     protected:
-        G4LogicalVolume* fWorldVolume = nullptr;
-        G4LogicalVolume* fScoringVolume = nullptr;
+        G4LogicalVolume* fLogicalWorldVolume = nullptr;
+        G4LogicalVolume* fLogicalScoringVolume = nullptr;
+        G4VPhysicalVolume* fPhysicalWorldVolume = nullptr;
+        std::vector<G4VPhysicalVolume*> fPhyImportanceVolumes;
     };
 }
 
