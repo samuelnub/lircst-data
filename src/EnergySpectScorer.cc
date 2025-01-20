@@ -26,6 +26,7 @@ namespace lircst {
         if (energy == 0) return false;
 
         // Collimation
+        // TODO: if we do solid-angle biasing, is this now unnecessary?
         G4ThreeVector SDPosition = G4ThreeVector(0, Util::GetWorldSize() * Util::GetWorldGunSDRatio(), 0);        
         G4ThreeVector momentumDirection = aStep->GetPreStepPoint()->GetMomentumDirection();
         G4ThreeVector incidentIntersection = G4ThreeVector(0,0,0); // With our setup, the intersection point is the centre of our world

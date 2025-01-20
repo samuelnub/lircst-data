@@ -9,25 +9,14 @@
 #include "Randomize.hh"
 #include "G4MultiFunctionalDetector.hh"
 #include "G4SDManager.hh"
-#include "G4RegionStore.hh"
 
 #include "EnergySpectScorer.hh"
 
 #include "Util.hh"
 
-<<<<<<< HEAD
-#include "CeleritasGlobals.hh"
-#include <accel/FastSimulationOffload.hh>
-#include <accel/SetupOptions.hh>
-=======
 #include <cmath>
->>>>>>> pre-celeritas
 
 namespace lircst {
-    DetectorConstruction::DetectorConstruction() : G4VUserDetectorConstruction() {
-        CeleritasGlobals::setup_options.make_along_step = celeritas::UniformAlongStepFactory();
-    }
-
     G4VPhysicalVolume* DetectorConstruction::Construct() {
         // World
         auto worldSize = Util::GetWorldSize();
@@ -79,20 +68,7 @@ namespace lircst {
                                                         Util::GetEnergyMin(),
                                                         Util::GetEnergyMax()); // pretty low (medical)
         mfd->RegisterPrimitive(energySpectScorer);
-<<<<<<< HEAD
-        SetSensitiveDetector(fScoringVolume, mfd);
-
-        // Celeritas
-        G4Region* defaultRegion = G4RegionStore::GetInstance()->GetRegion("DefaultRegionForTheWorld");
-        new celeritas::FastSimulationOffload(
-            "accel::FastSimulationOffload",
-            defaultRegion,
-            &CeleritasGlobals::shared_params,
-            &CeleritasGlobals::local_transporter
-        );
-=======
         SetSensitiveDetector(fLogicalScoringVolume, mfd);
->>>>>>> pre-celeritas
     }
 
     void DetectorConstruction::ConstructImportanceVolumes() {
@@ -115,11 +91,16 @@ namespace lircst {
     }
 
     G4VIStore* DetectorConstruction::CreateImportanceStore() {
+        
         if(!fPhyImportanceVolumes.size()) {
             G4cerr << "No importance volumes to create store for!" << G4endl;
             return nullptr;
         }
         G4IStore* iStore = G4IStore::GetInstance();
+
+        /* TODO: Clear this up because we won't be using importance biasing */
+        return iStore;
+
         for(int i = 0; i < fPhyImportanceVolumes.size(); i++) {
             G4cout << "Adding importance volume " << i << G4endl;
             iStore->AddImportanceGeometryCell(std::pow(2, i), *fPhyImportanceVolumes[i]);
