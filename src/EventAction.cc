@@ -7,12 +7,8 @@
 
 #include "RunAction.hh"
 
-#include "CeleritasGlobals.hh"
-
 namespace lircst {
     void EventAction::BeginOfEventAction(const G4Event* event) {
-        // Celeritas
-        CeleritasGlobals::simple_offload.BeginOfEventAction(event);
     }
 
     void EventAction::EndOfEventAction(const G4Event* event) {
@@ -33,8 +29,5 @@ namespace lircst {
         // So cursed
         auto runAction = static_cast<RunAction*>(const_cast<G4UserRunAction*>(G4RunManager::GetRunManager()->GetUserRunAction()));
         runAction->AddHitsMap(hitsMap);
-
-        // Celeritas
-        CeleritasGlobals::simple_offload.EndOfEventAction(event);
     }
 }

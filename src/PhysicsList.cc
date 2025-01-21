@@ -25,6 +25,5 @@ namespace lircst {
         physicsHelper->RegisterProcess(new G4PhotoElectricEffect, particle);
         physicsHelper->RegisterProcess(new G4ComptonScattering, particle);
         physicsHelper->RegisterProcess(new G4GammaConversion, particle);
-        // Celeritas debug   physicsHelper->RegisterProcess(new G4RayleighScattering, particle);
-    }
+        physicsHelper->RegisterProcess(new G4RayleighScattering, particle);}
 }

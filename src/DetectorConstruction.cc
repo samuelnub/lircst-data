@@ -17,6 +17,8 @@
 #include <cmath>
 
 namespace lircst {
+    DetectorConstruction::DetectorConstruction() : G4VUserDetectorConstruction() {}
+
     G4VPhysicalVolume* DetectorConstruction::Construct() {
         // World
         auto worldSize = Util::GetWorldSize();
