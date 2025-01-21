@@ -4,10 +4,10 @@
 #include "G4VUserParallelWorld.hh"
 
 namespace lircst {
-    class ParaWorldConstruction : public G4VUserParallelWorld {
+    class ParallelWorldConstruction : public G4VUserParallelWorld {
     public:
-        ParaWorldConstruction(G4String worldName);
-        ~ParaWorldConstruction() override = default;
+        ParallelWorldConstruction(G4String worldName);
+        ~ParallelWorldConstruction() override = default;
 
         virtual void Construct();
         virtual void ConstructSD();

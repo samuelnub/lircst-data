@@ -11,9 +11,9 @@
 #include "Util.hh"
 
 namespace lircst {
-    ParaWorldConstruction::ParaWorldConstruction(G4String worldName) : G4VUserParallelWorld(worldName) {}
+    ParallelWorldConstruction::ParallelWorldConstruction(G4String worldName) : G4VUserParallelWorld(worldName) {}
 
-    void ParaWorldConstruction::Construct() {
+    void ParallelWorldConstruction::Construct() {
         // Construct the world
         
         auto paraPhyWorld = GetWorld();
@@ -27,7 +27,7 @@ namespace lircst {
 
     }
 
-    void ParaWorldConstruction::ConstructSD() {
+    void ParallelWorldConstruction::ConstructSD() {
         // Create and link biasing operator
         auto biasingOperator = new BiasingOperator();
 

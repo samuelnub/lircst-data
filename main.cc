@@ -7,10 +7,12 @@
 #include "G4GeometrySampler.hh"
 #include "G4ImportanceBiasing.hh"
 #include "G4GeometryManager.hh"
+#include "G4GenericBiasingPhysics.hh"
 
 #include "PhysicsList.hh"
 #include "DetectorConstruction.hh"
 #include "ActionInitialisation.hh"
+#include "ParallelWorldConstruction.hh"
 
 using namespace lircst;
 
@@ -26,19 +28,21 @@ int main(int argc,char** argv) {
 
         // Set must-have user init classes
         auto detector = new DetectorConstruction();
+        auto parallelWorld = new ParallelWorldConstruction("ParaWorld");
+        detector->RegisterParallelWorld(parallelWorld);
         runManager->SetUserInitialization(detector);
-        // For importance biasing
-        G4GeometrySampler geomSampler(detector->GetWorldVolume(), "gamma");
+
+        auto biasingPhysics = new G4GenericBiasingPhysics();
+        biasingPhysics->NonPhysicsBias("gamma");
+        biasingPhysics->AddParallelGeometry("gamma", "ParaWorld");
+
         auto physList = new PhysicsList();
-        physList->RegisterPhysics(new G4ImportanceBiasing(&geomSampler));
+        physList->RegisterPhysics(biasingPhysics);
         runManager->SetUserInitialization(physList);
         runManager->SetUserInitialization(new ActionInitialisation);
 
         // Init G4 kernel
         runManager->Initialize();
-
-        // For importance biasing
-        detector->CreateImportanceStore();
 
         auto visManager = new G4VisExecutive(argc, argv);
         visManager->Initialize();
@@ -66,9 +70,6 @@ int main(int argc,char** argv) {
             runManager->BeamOn(noOfEvents);
             G4cout << "End of run tee hee" << G4endl;
         }
-
-        // For importance biasing clean-up
-        G4GeometryManager::GetInstance()->OpenGeometry();
 
         // Terminate job
         delete visManager;
