@@ -31,7 +31,7 @@ namespace lircst {
         G4ThreeVector momentumDirection = aStep->GetPreStepPoint()->GetMomentumDirection();
         G4ThreeVector incidentIntersection = G4ThreeVector(0,0,0); // With our setup, the intersection point is the centre of our world
         G4ThreeVector pinholePosition = Util::GetCollSDToIncidentRatio() * (SDPosition + incidentIntersection);
-        G4double pinholeTolerance = std::cos(1 * deg);
+        G4double pinholeTolerance = std::cos(Util::GetCollCosAcceptanceDeg() * deg);
         G4ThreeVector expectedDirection = (pinholePosition - aStep->GetPreStepPoint()->GetPosition()).unit();
         G4double alignment = std::abs(expectedDirection.dot(momentumDirection));
         if (alignment < pinholeTolerance) return false;

@@ -72,6 +72,10 @@ namespace lircst {
     }
 
     void DetectorConstruction::ConstructImportanceVolumes() {
+
+        // UNUSED
+        return;
+
         // Logical slabs
         int numSlabs = 16;
 
@@ -91,6 +95,9 @@ namespace lircst {
     }
 
     G4VIStore* DetectorConstruction::CreateImportanceStore() {
+
+        // UNUSED
+        return nullptr;
         
         if(!fPhyImportanceVolumes.size()) {
             G4cerr << "No importance volumes to create store for!" << G4endl;

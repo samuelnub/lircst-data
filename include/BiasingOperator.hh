@@ -6,6 +6,7 @@
 #include "BiasingOperation.hh"
 
 #include "G4GenericMessenger.hh"
+#include "G4ThreeVector.hh"
 
 namespace lircst {
     class BiasingOperator : public G4VBiasingOperator {
@@ -49,6 +50,9 @@ namespace lircst {
         // Messengers to change the 
         G4GenericMessenger*  fSplittingFactorMessenger;
         G4GenericMessenger* fApplyProbabilityMessenger;
+
+        G4ThreeVector fCollPosition;
+        G4double fCollTolerance;
     };
 }
 
