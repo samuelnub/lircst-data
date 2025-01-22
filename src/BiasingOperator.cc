@@ -10,7 +10,7 @@
 namespace lircst {
     BiasingOperator::BiasingOperator()
     : G4VBiasingOperator("lircstDataBiasingOperator"),
-    fSplittingFactor(2), // TODO: scale probabiltiy based on "cone of acceptance" proportion
+    fSplittingFactor(10), // TODO: scale probabiltiy based on "cone of acceptance" proportion
     fApplyProbability(1.0) {
         fSplitAndKillOperation = new BiasingOperation("splitAndkill");
 
@@ -66,8 +66,6 @@ namespace lircst {
     G4VBiasingOperation* BiasingOperator::ProposeNonPhysicsBiasingOperation( const G4Track* track,
                                         const G4BiasingProcessInterface* callingProcess) {
 
-        G4cout << "In BiasingOperator::ProposeNonPhysicsBiasingOperation()" << G4endl;
-
         // Check if particle is a gamma
         if ( track->GetDefinition() != G4Gamma::GammaDefinition() ) return 0;
 
@@ -81,7 +79,7 @@ namespace lircst {
         G4double alignment = expectedDirection.dot(momentumDirection); // No std::abs here because we only want those travelling towards collimator
         if (alignment < fCollTolerance) return 0;
 
-        G4cout << "Proposing biasing operation" << G4endl;
+        G4cout << "Proposing biasing operation as we meet the criteria in our Biasing Operator" << G4endl;
 
         return fSplitAndKillOperation;
     }
