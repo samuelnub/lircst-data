@@ -14,6 +14,8 @@
 #include "ActionInitialisation.hh"
 #include "ParallelWorldConstruction.hh"
 
+#include <chrono>
+
 using namespace lircst;
 
 // Based on https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/GettingStarted/mainProgram.html
@@ -28,8 +30,8 @@ int main(int argc,char** argv) {
 
         // Set must-have user init classes
         auto detector = new DetectorConstruction();
-        auto parallelWorld = new ParallelWorldConstruction("ParaWorld");
-        detector->RegisterParallelWorld(parallelWorld);
+        auto parallelWorld = new ParallelWorldConstruction("ParaWorld"); // TODO: for biasing
+        detector->RegisterParallelWorld(parallelWorld); // TODO: for biasing
         runManager->SetUserInitialization(detector);
 
         auto physList = new PhysicsList();
@@ -39,7 +41,7 @@ int main(int argc,char** argv) {
         biasingPhysics->NonPhysicsBias("gamma");
         biasingPhysics->AddParallelGeometry("gamma", "ParaWorld");
 
-        physList->RegisterPhysics(biasingPhysics);
+        physList->RegisterPhysics(biasingPhysics); // TODO: for biasing
         runManager->SetUserInitialization(physList);
         runManager->SetUserInitialization(new ActionInitialisation);
 
@@ -68,9 +70,15 @@ int main(int argc,char** argv) {
 
         if (argc == 1) {
             // Start a run if not in vis ui session
-            int noOfEvents = 10; // 10 teeny tiny 
+
+            auto timestampStart = (unsigned long)time(NULL);
+
+            int noOfEvents = 1000000; // 1M events
             runManager->BeamOn(noOfEvents);
-            G4cout << "End of run tee hee" << G4endl;
+
+            auto timestampEnd = (unsigned long)time(NULL);
+
+            G4cout << "End of run tee hee, took " << timestampEnd - timestampStart << " seconds" << G4endl;
         }
 
         // Terminate job

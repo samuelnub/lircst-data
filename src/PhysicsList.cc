@@ -32,7 +32,7 @@ namespace lircst {
         physicsHelper->RegisterProcess(new G4RayleighScattering, particle);
 
         // For biasing
-        G4BiasingHelper::ActivateNonPhysicsBiasing(particle->GetProcessManager());
-        G4BiasingHelper::AddLimiterProcess(particle->GetProcessManager());
+        G4BiasingHelper::ActivateNonPhysicsBiasing(particle->GetProcessManager()); // TODO: for biasing
+        G4BiasingHelper::AddLimiterProcess(particle->GetProcessManager()); // TODO: for biasing
     }
 }

@@ -50,6 +50,9 @@ namespace lircst {
 
         G4int    fSplittingFactor;
         G4double fApplyProbability;
+
+        G4ThreeVector fCollPosition;
+        G4double fCollTolerance;
     };
 }
 

@@ -52,8 +52,6 @@ namespace lircst {
 
         private:
         BiasingOperation* fSplitAndKillOperation;
-        G4int    fSplittingFactor;
-        G4double fApplyProbability;
 
         // What the hell is this
         const G4ParticleDefinition*                      fParticleToBias;
@@ -61,13 +59,6 @@ namespace lircst {
         G4int                                        fParallelWorldIndex;
         const G4BiasingProcessSharedData*             fBiasingSharedData;
         const G4ParallelGeometriesLimiterProcess* fBiasingLimiterProcess;
-
-        // Messengers to change the 
-        G4GenericMessenger*  fSplittingFactorMessenger;
-        G4GenericMessenger* fApplyProbabilityMessenger;
-
-        G4ThreeVector fCollPosition;
-        G4double fCollTolerance;
     };
 }
 
