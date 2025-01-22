@@ -5,8 +5,12 @@
 
 #include "BiasingOperation.hh"
 
+#include "G4ParticleDefinition.hh"
+#include "G4ParallelGeometriesLimiterProcess.hh"
+#include "G4BiasingProcessSharedData.hh"
 #include "G4GenericMessenger.hh"
 #include "G4ThreeVector.hh"
+#include "G4VPhysicalVolume.hh"
 
 namespace lircst {
     class BiasingOperator : public G4VBiasingOperator {
@@ -24,7 +28,10 @@ namespace lircst {
         // Optional from base class:
         // -------------------------
         void StartRun();
-        
+
+        void SetParallelWorld( G4VPhysicalVolume* parallelWorld )
+        { fParallelWorld = parallelWorld; }
+
     private:
         // --------------------------
         // Mandatory from base class:
@@ -47,6 +54,14 @@ namespace lircst {
         BiasingOperation* fSplitAndKillOperation;
         G4int    fSplittingFactor;
         G4double fApplyProbability;
+
+        // What the hell is this
+        const G4ParticleDefinition*                      fParticleToBias;
+        G4VPhysicalVolume*                                fParallelWorld;
+        G4int                                        fParallelWorldIndex;
+        const G4BiasingProcessSharedData*             fBiasingSharedData;
+        const G4ParallelGeometriesLimiterProcess* fBiasingLimiterProcess;
+
         // Messengers to change the 
         G4GenericMessenger*  fSplittingFactorMessenger;
         G4GenericMessenger* fApplyProbabilityMessenger;

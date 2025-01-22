@@ -4,6 +4,7 @@
 #include "G4VBiasingOperation.hh"
 #include "G4ParticleChange.hh"
 #include "G4ParticleChangeForNothing.hh"
+#include "G4BiasingProcessSharedData.hh"
 
 namespace lircst {
     class BiasingOperation : public G4VBiasingOperation {
@@ -27,6 +28,13 @@ namespace lircst {
                                           const G4Step* );
 
 
+        void  SetParallelWorldIndex( G4int parallelWorldIndex )
+        { fParallelWorldIndex = parallelWorldIndex; }
+        G4int GetParallelWorldIndex() const
+        { return fParallelWorldIndex; }
+        void SetBiasingSharedData( const G4BiasingProcessSharedData* sharedData )
+        { fBiasingSharedData = sharedData; }
+
         void SetSplittingFactor( G4int splittingFactor ) { fSplittingFactor = splittingFactor; }
         void SetApplyProbability( G4double proba ) { fApplyProbability = proba; }
 
@@ -36,6 +44,10 @@ namespace lircst {
     private:
         G4ParticleChange            fParticleChange;
         G4ParticleChangeForNothing  fParticleChangeForNothing;
+
+        G4int fParallelWorldIndex;
+        const G4BiasingProcessSharedData* fBiasingSharedData;
+
         G4int    fSplittingFactor;
         G4double fApplyProbability;
     };

@@ -1,6 +1,9 @@
 #include "BiasingOperator.hh"
 
 #include "G4Gamma.hh"
+#include "G4ProcessManager.hh"
+#include "G4BiasingProcessInterface.hh"
+#include "G4ParticleTable.hh"
 
 #include "Util.hh"
 
@@ -10,6 +13,8 @@ namespace lircst {
     fSplittingFactor(2), // TODO: scale probabiltiy based on "cone of acceptance" proportion
     fApplyProbability(1.0) {
         fSplitAndKillOperation = new BiasingOperation("splitAndkill");
+
+        fParticleToBias = G4ParticleTable::GetParticleTable()->FindParticle("gamma");
         
         // -- Define messengers:
         fSplittingFactorMessenger = 
@@ -34,6 +39,17 @@ namespace lircst {
     }
 
     void BiasingOperator::StartRun() {
+        // ---------------
+        // -- Setup stage:
+        // ---------------
+        // -- get the particle process manager...
+        const G4ProcessManager* processManager = fParticleToBias->GetProcessManager();
+        // -- ... to obtain the biasing information shared among this particle processes:
+        fBiasingSharedData = G4BiasingProcessInterface::GetSharedData( processManager );
+
+        fBiasingLimiterProcess = fBiasingSharedData->GetParallelGeometriesLimiterProcess();
+        const_cast<G4ParallelGeometriesLimiterProcess*>(fBiasingLimiterProcess)->AddParallelWorld( "ParaWorld" );
+
         fSplitAndKillOperation->SetSplittingFactor ( fSplittingFactor  );
         fSplitAndKillOperation->SetApplyProbability( fApplyProbability );
         G4cout << GetName() << " : starting run with splitting factor = " << fSplittingFactor
@@ -50,6 +66,8 @@ namespace lircst {
     G4VBiasingOperation* BiasingOperator::ProposeNonPhysicsBiasingOperation( const G4Track* track,
                                         const G4BiasingProcessInterface* callingProcess) {
 
+        G4cout << "In BiasingOperator::ProposeNonPhysicsBiasingOperation()" << G4endl;
+
         // Check if particle is a gamma
         if ( track->GetDefinition() != G4Gamma::GammaDefinition() ) return 0;
 
@@ -62,6 +80,8 @@ namespace lircst {
         G4ThreeVector expectedDirection = (fCollPosition - step->GetPreStepPoint()->GetPosition()).unit();
         G4double alignment = expectedDirection.dot(momentumDirection); // No std::abs here because we only want those travelling towards collimator
         if (alignment < fCollTolerance) return 0;
+
+        G4cout << "Proposing biasing operation" << G4endl;
 
         return fSplitAndKillOperation;
     }

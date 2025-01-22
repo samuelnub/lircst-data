@@ -7,6 +7,8 @@
 #include "G4LogicalVolumeStore.hh"
 
 #include "BiasingOperator.hh"
+#include "G4ParallelGeometriesLimiterProcess.hh"
+#include "G4BiasingHelper.hh"
 
 #include "Util.hh"
 
@@ -15,6 +17,7 @@ namespace lircst {
 
     void ParallelWorldConstruction::Construct() {
         // Construct the world
+        G4cout << "Constructing parallel world" << G4endl;
         
         auto paraPhyWorld = GetWorld();
         auto paraLogWorld = paraPhyWorld->GetLogicalVolume();
@@ -31,8 +34,13 @@ namespace lircst {
         // Create and link biasing operator
         auto biasingOperator = new BiasingOperator();
 
+        biasingOperator->SetParallelWorld(GetWorld());
+
         // Attach to logical volume where biasing is to be applied
         auto paraPhantomLogical = G4LogicalVolumeStore::GetInstance()->GetVolume("ParaPhantom");
+        
         biasingOperator->AttachTo(paraPhantomLogical);
+
+        G4cout << "Biasing operator attached to ParaPhantom" << G4endl;
     }
 }

@@ -32,11 +32,13 @@ int main(int argc,char** argv) {
         detector->RegisterParallelWorld(parallelWorld);
         runManager->SetUserInitialization(detector);
 
+        auto physList = new PhysicsList();
         auto biasingPhysics = new G4GenericBiasingPhysics();
+
+        biasingPhysics->BeVerbose();
         biasingPhysics->NonPhysicsBias("gamma");
         biasingPhysics->AddParallelGeometry("gamma", "ParaWorld");
 
-        auto physList = new PhysicsList();
         physList->RegisterPhysics(biasingPhysics);
         runManager->SetUserInitialization(physList);
         runManager->SetUserInitialization(new ActionInitialisation);
@@ -66,7 +68,7 @@ int main(int argc,char** argv) {
 
         if (argc == 1) {
             // Start a run if not in vis ui session
-            int noOfEvents = 10000000; // 10 teeny tiny mil
+            int noOfEvents = 10; // 10 teeny tiny 
             runManager->BeamOn(noOfEvents);
             G4cout << "End of run tee hee" << G4endl;
         }
