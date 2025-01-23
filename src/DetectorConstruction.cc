@@ -158,7 +158,7 @@ namespace lircst {
         auto tumourSize = lungSize * 0.8;
         auto tumourSolid = new G4Tubs("Tumour", 0, tumourSize * 0.2, tumourSize, 0, 360 * deg);
         auto tumourLogical = new G4LogicalVolume(tumourSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_Pb"), "Tumour");
-        new G4PVPlacement(new G4RotationMatrix(0, 90 * deg, 0), G4ThreeVector(lungSize * 0.3, 0, 0), tumourLogical, "Tumour", lungLogical, false, 0, true);
+        new G4PVPlacement(new G4RotationMatrix(0, 90 * deg, 0), G4ThreeVector(lungSize * -0.3, 0, 0), tumourLogical, "Tumour", lungLogical, false, 0, true);
     
         return phantomPhysical;
     }
