@@ -32,10 +32,12 @@ namespace lircst {
         if (energy == 0) return false;
 
         // Collimation
+
         G4ThreeVector momentumDirection = aStep->GetPreStepPoint()->GetMomentumDirection();
         G4ThreeVector expectedDirection = (fCollPosition - aStep->GetPreStepPoint()->GetPosition()).unit();
         G4double alignment = std::abs(expectedDirection.dot(momentumDirection));
         if (alignment < fCollTolerance) return false;
+
 
         // Get pos of the step, and what pixel that corresponds to
         // Get local pos - local to touchable!
