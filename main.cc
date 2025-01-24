@@ -16,6 +16,8 @@
 
 #include <chrono>
 
+#include "Util.hh"
+
 using namespace lircst;
 
 // Based on https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/GettingStarted/mainProgram.html
@@ -30,19 +32,24 @@ int main(int argc,char** argv) {
 
         // Set must-have user init classes
         auto detector = new DetectorConstruction();
-        auto parallelWorld = new ParallelWorldConstruction("ParaWorld"); // TODO: for biasing
-        detector->RegisterParallelWorld(parallelWorld); // TODO: for biasing
+
+        if(Util::GetEnableSolidAngleBiasing()) {
+            auto parallelWorld = new ParallelWorldConstruction("ParaWorld"); // TODO: for biasing
+            detector->RegisterParallelWorld(parallelWorld); // TODO: for biasing
+        }
         runManager->SetUserInitialization(detector);
 
         auto physList = new PhysicsList();
-        auto biasingPhysics = new G4GenericBiasingPhysics();
 
-        biasingPhysics->BeVerbose();
-        biasingPhysics->NonPhysicsBias("gamma");
-        biasingPhysics->AddParallelGeometry("gamma", "ParaWorld");
-
-        physList->RegisterPhysics(biasingPhysics); // TODO: for biasing
+        if(Util::GetEnableSolidAngleBiasing()) {
+            auto biasingPhysics = new G4GenericBiasingPhysics();
+            biasingPhysics->BeVerbose();
+            biasingPhysics->NonPhysicsBias("gamma");
+            biasingPhysics->AddParallelGeometry("gamma", "ParaWorld");
+            physList->RegisterPhysics(biasingPhysics); // TODO: for biasing
+        }
         runManager->SetUserInitialization(physList);
+
         runManager->SetUserInitialization(new ActionInitialisation);
 
         // Init G4 kernel

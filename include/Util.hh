@@ -34,6 +34,7 @@ namespace lircst {
         static const G4double GetWorldGunSDRatio() { return fWorldGunSDRatio; }
         static const G4double GetCollSDToIncidentRatio() { return fCollSDToIncidentRatio; }
         static const G4double GetCollCosAcceptanceDeg() { return fCollCosAcceptanceDeg; }
+        static const G4bool GetEnableSolidAngleBiasing() { return fEnableSolidAngleBiasing; }
 
     private:
         static const G4int fNumPixelsX = 256;
@@ -48,6 +49,7 @@ namespace lircst {
         static constexpr G4double fWorldGunSDRatio = 0.9;
         static constexpr G4double fCollSDToIncidentRatio = 0.65;
         static constexpr G4double fCollCosAcceptanceDeg = 1;
+        static const G4bool fEnableSolidAngleBiasing = true;
     };
 }
 

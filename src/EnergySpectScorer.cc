@@ -11,6 +11,12 @@ namespace lircst {
         fNbins = nBins;
         fEMin = eMin;
         fEMax = eMax;
+
+        G4ThreeVector SDPosition = G4ThreeVector(0, Util::GetWorldSize() * Util::GetWorldGunSDRatio(), 0);        
+        G4ThreeVector incidentIntersection = G4ThreeVector(0,0,0); // With our setup, the intersection point is the centre of our world
+        fCollPosition = Util::GetCollSDToIncidentRatio() * (SDPosition + incidentIntersection);
+
+        fCollTolerance = std::cos(Util::GetCollCosAcceptanceDeg() * deg);
     }
 
     void EnergySpectScorer::Initialize(G4HCofThisEvent* hce) {
@@ -26,15 +32,10 @@ namespace lircst {
         if (energy == 0) return false;
 
         // Collimation
-        // TODO: if we do solid-angle biasing, is this now unnecessary?
-        G4ThreeVector SDPosition = G4ThreeVector(0, Util::GetWorldSize() * Util::GetWorldGunSDRatio(), 0);        
         G4ThreeVector momentumDirection = aStep->GetPreStepPoint()->GetMomentumDirection();
-        G4ThreeVector incidentIntersection = G4ThreeVector(0,0,0); // With our setup, the intersection point is the centre of our world
-        G4ThreeVector pinholePosition = Util::GetCollSDToIncidentRatio() * (SDPosition + incidentIntersection);
-        G4double pinholeTolerance = std::cos(Util::GetCollCosAcceptanceDeg() * deg);
-        G4ThreeVector expectedDirection = (pinholePosition - aStep->GetPreStepPoint()->GetPosition()).unit();
+        G4ThreeVector expectedDirection = (fCollPosition - aStep->GetPreStepPoint()->GetPosition()).unit();
         G4double alignment = std::abs(expectedDirection.dot(momentumDirection));
-        if (alignment < pinholeTolerance) return false;
+        if (alignment < fCollTolerance) return false;
 
         // Get pos of the step, and what pixel that corresponds to
         // Get local pos - local to touchable!

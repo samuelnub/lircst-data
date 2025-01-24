@@ -13,6 +13,8 @@
 #include "G4BiasingProcessInterface.hh"
 #include "G4ProcessManager.hh"
 
+#include "Util.hh"
+
 namespace lircst {
     void PhysicsList::ConstructParticle() {
         G4Gamma::GammaDefinition();
@@ -32,7 +34,9 @@ namespace lircst {
         physicsHelper->RegisterProcess(new G4RayleighScattering, particle);
 
         // For biasing
-        G4BiasingHelper::ActivateNonPhysicsBiasing(particle->GetProcessManager()); // TODO: for biasing
-        G4BiasingHelper::AddLimiterProcess(particle->GetProcessManager()); // TODO: for biasing
+        if(Util::GetEnableSolidAngleBiasing()) {
+            G4BiasingHelper::ActivateNonPhysicsBiasing(particle->GetProcessManager()); // TODO: for biasing
+            G4BiasingHelper::AddLimiterProcess(particle->GetProcessManager()); // TODO: for biasing
+        }
     }
 }

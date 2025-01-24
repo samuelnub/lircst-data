@@ -41,14 +41,17 @@ namespace lircst {
     G4VParticleChange* BiasingOperation::GenerateBiasingFinalState( const G4Track* track,
                                       const G4Step* step) {
 
+        G4cout << "GenerateBiasingFinalState Current step number with step status: " << track->GetCurrentStepNumber() << " " << step->GetPostStepPoint()->GetStepStatus() << G4endl;
+
         // Check if step is limited by the geometry: as we attached the biasing operator
         // to the absorber layer, this volume boundary is the one of the absorber.
         // (check of current step # of track is inelegant, but is to fix a "feature"
         // that a cloned track can wrongly be seen in the wrong volume, because of numerical
         // precision issue. In this case it makes a tiny step, which should be disregarded).
-        if ( ( step->GetPostStepPoint()->GetStepStatus() == fGeomBoundary ) &&
-            ( track->GetCurrentStepNumber() != 1 ) ) {
-            
+        if (( step->GetPostStepPoint()->GetStepStatus() == fGeomBoundary ) &&
+            ( track->GetCurrentStepNumber() != 1 ) &&
+            ( true ) ) { // TODO: ignore if we have just entered the paraphantom geometry
+
             // -- Before deciding for killing or splitting, we make decision on applying
             // -- the technique or not:
             G4double trial = G4UniformRand(); // -- Note: G4UniformRand() is thread-safe
