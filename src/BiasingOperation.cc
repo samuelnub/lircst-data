@@ -15,17 +15,6 @@ namespace lircst {
         G4ThreeVector SDPosition = G4ThreeVector(0, Util::GetWorldSize() * Util::GetWorldGunSDRatio(), 0);        
         G4ThreeVector incidentIntersection = G4ThreeVector(0,0,0); // With our setup, the intersection point is the centre of our world
         fCollPosition = Util::GetCollSDToIncidentRatio() * (SDPosition + incidentIntersection);
-
-        // We widen the tolerance to give more leeway. The actual SD collimator will have the narrow tolerance
-        G4double widenCollFactor = 10;
-        fCollTolerance = std::cos(Util::GetCollCosAcceptanceDeg() * widenCollFactor * deg);
-
-        // Set split factor and application probability
-        G4double preciseSplittingFactor = 2.0 / (1.0 - fCollTolerance);
-        fSplittingFactor = static_cast<G4int>(std::round(preciseSplittingFactor));
-        fApplyProbability = 1.0;
-
-        G4cout << "Splitting factor: " << fSplittingFactor << G4endl;
     }
 
     G4double BiasingOperation::DistanceToApplyOperation( const G4Track* ,
@@ -41,16 +30,26 @@ namespace lircst {
     G4VParticleChange* BiasingOperation::GenerateBiasingFinalState( const G4Track* track,
                                       const G4Step* step) {
 
-        G4cout << "GenerateBiasingFinalState Current step number with step status: " << track->GetCurrentStepNumber() << " " << step->GetPostStepPoint()->GetStepStatus() << G4endl;
+        // G4cout << "GenerateBiasingFinalState Current step number with step status: " << track->GetCurrentStepNumber() << " " << step->GetPostStepPoint()->GetStepStatus() << G4endl;
 
         // Check if step is limited by the geometry: as we attached the biasing operator
         // to the absorber layer, this volume boundary is the one of the absorber.
         // (check of current step # of track is inelegant, but is to fix a "feature"
         // that a cloned track can wrongly be seen in the wrong volume, because of numerical
         // precision issue. In this case it makes a tiny step, which should be disregarded).
-        if (( step->GetPostStepPoint()->GetStepStatus() == fGeomBoundary ) &&
+        if ( // ( step->GetPostStepPoint()->GetStepStatus() == fGeomBoundary ) &&
             ( track->GetCurrentStepNumber() != 1 ) &&
             ( true ) ) { // TODO: ignore if we have just entered the paraphantom geometry
+
+            // Scale fCollTolerance and fSplittingFactor based on the current step, narrowing the tolerance as we increase the step number
+            G4double stepFactor = 1.0 / std::pow(2, (track->GetCurrentStepNumber()-2)*2);
+            G4double widenCollFactor = 90;
+            G4double preCosTolerance = Util::GetCollCosAcceptanceDeg() * stepFactor * widenCollFactor;
+            fCollTolerance = std::cos(preCosTolerance * deg);
+            G4double preciseSplittingFactor = 2.0 / (1.0 - fCollTolerance);
+            fSplittingFactor = static_cast<G4int>(std::round(preciseSplittingFactor));
+
+            // G4cout << "Collimation tolerance and splitting factor: " << fCollTolerance << " (pre-cos tolerance:) " << preCosTolerance << " " << fSplittingFactor << G4endl;
 
             // -- Before deciding for killing or splitting, we make decision on applying
             // -- the technique or not:
