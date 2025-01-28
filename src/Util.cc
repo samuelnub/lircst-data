@@ -3,6 +3,7 @@
 #include <vector>
 #include <ctime>
 
+#include "npy.hh"
 #include "BMPMini.hh"
 
 using namespace std;
@@ -25,6 +26,27 @@ namespace lircst {
         G4String imgExtention = ".bmp";
         
         std::map<G4int,G4int> map = data.GetMap();
+
+        // Export .npy file of shape i x j x bin
+        npy::npy_data<G4int> npyData;
+        npyData.shape = {fNumPixelsX, fNumPixelsY, fNumBins};
+        npyData.data.reserve(fNumPixelsX * fNumPixelsY * fNumBins);
+        npyData.fortran_order = false;
+        // Iterate over i, j, bin, and if count exists in map, add it to npyData
+        for (G4int i = 0; i < fNumPixelsX; i++) {
+            for (G4int j = 0; j < fNumPixelsY; j++) {
+                for (G4int bin = 0; bin < fNumBins; bin++) {
+                    G4int key = GenMapKey(i, j, bin);
+                    if (map.find(key) != map.end()) {
+                        npyData.data.push_back(map[key]);
+                    } else {
+                        npyData.data.push_back(0);
+                    }
+                }
+            }
+        }
+        npy::write_npy(folder + filename + ".npy", npyData);
+        
 
         // Deconstruct key into i, j, bin
         auto unpackedData = vector<vector<vector<G4int>>>(fNumPixelsX, vector<vector<G4int>>(fNumPixelsY, vector<G4int>(fNumBins, 0)));
