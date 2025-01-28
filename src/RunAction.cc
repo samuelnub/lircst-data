@@ -10,6 +10,8 @@
 
 #include "EnergySpectScorer.hh"
 
+#include "GroundTruthExporter.hh"
+
 namespace lircst {
     RunAction::RunAction() : G4UserRunAction() {
         G4AccumulableManager::Instance()->RegisterAccumulable(&fAccumulatedHitsMap);
@@ -18,6 +20,11 @@ namespace lircst {
 
     void RunAction::BeginOfRunAction(const G4Run* run) {
         if (IsMaster()) {
+
+            // TODO: hey why not generate the ground truth label at the start of the run
+            G4cout << "Generating ground truth label" << G4endl;
+            GroundTruthExporter().Export();
+
             // P.S. If you do multiple runs per session, we will accumulate over all runs
             G4cout << "Begin of global run action" << G4endl;
         }

@@ -80,7 +80,7 @@ int main(int argc,char** argv) {
 
             auto timestampStart = (unsigned long)time(NULL);
 
-            int noOfEvents = 1000000000; // 166666667; // With 10 deg biasing, this is equiv to 1e9 events
+            int noOfEvents = 1000000000;
             runManager->BeamOn(noOfEvents);
 
             auto timestampEnd = (unsigned long)time(NULL);

@@ -38,7 +38,6 @@ namespace lircst {
             int j = remainder1 / fNumPixelsY;
             int i = remainder1 % fNumPixelsY;
 
-            G4cout << "i, j, bin, value: " << i << ", " << j << ", " << bin << ", " << value << ", " << G4endl;
             unpackedData[i][j][bin] = value;
         }
 
@@ -57,9 +56,6 @@ namespace lircst {
                 G4double one = 1.0;
                 G4double maxEnergy = fEnergyMax * 2; // Arbitrary scaling factor to allow accumulated photons to shine through
                 uint8_t pixelValue = static_cast<uint8_t>(min(totalEnergy / maxEnergy, one) * 255);
-                if (pixelValue > 0) {
-                    G4cout << "Pixel value at i, j, and totalEnergy: " << i << ", " << j << " is " << static_cast<G4int>(pixelValue) << " and " << totalEnergy << G4endl;
-                }
                 pixelData[i * fNumPixelsX + j] = static_cast<uint8_t>(pixelValue);
             }
         }
