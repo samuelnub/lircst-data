@@ -1,2 +1,5 @@
 /.vscode
-/build
+/build/*
+
+# Okay so we ignored the build folder, but let's specifically whitelist the executable (it's tiny)
+!/build/lircstData

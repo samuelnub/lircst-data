@@ -21,7 +21,7 @@ namespace lircst {
     void RunAction::BeginOfRunAction(const G4Run* run) {
         if (IsMaster()) {
 
-            // TODO: hey why not generate the ground truth label at the start of the run
+            // Hey why not generate the ground truth label at the start of the run
             G4cout << "Generating ground truth label" << G4endl;
             GroundTruthExporter().Export();
 
