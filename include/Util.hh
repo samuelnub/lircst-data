@@ -18,9 +18,15 @@ namespace lircst {
     public:
         static G4int GenMapKey(G4int x, G4int y, G4int bin);
 
+        static G4int GenRandomInt(G4int min, G4int max);
+        static G4double GenRandomDouble(G4double min, G4double max);
+        static G4double GenRandomDoubleGauss(G4double mean, G4double sigma);
+
+        static G4String GenUniqueInstanceRunName();
+
         static G4double BinToEnergy(G4int bin);
 
-        static G4bool ExportData(AccumulableMap<G4int> data, G4String filename);
+        static G4bool ExportData(AccumulableMap<G4int> data);
 
         static const G4int GetNumPixelsX() { return fNumPixelsX; } 
         static const G4int GetNumPixelsY() { return fNumPixelsY; }

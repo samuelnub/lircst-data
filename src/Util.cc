@@ -1,5 +1,7 @@
 #include "Util.hh"
 
+#include "Randomize.hh"
+
 #include <vector>
 #include <ctime>
 
@@ -14,16 +16,30 @@ namespace lircst {
         return x + fNumPixelsY * (y + fNumPixelsY * bin);
     }
 
+    G4int Util::GenRandomInt(G4int min, G4int max) {
+        return min + static_cast<int>(G4UniformRand() * (max - min + 1));
+    }
+
+    G4double Util::GenRandomDouble(G4double min, G4double max) {
+        return min + G4UniformRand() * (max - min);
+    }
+
+    G4double Util::GenRandomDoubleGauss(G4double mean, G4double sigma) {
+        return G4RandGauss::shoot(mean, sigma);
+    }
+
+    G4String Util::GenUniqueInstanceRunName() {
+        auto name = std::to_string(G4Random::getTheSeed());
+        return name;
+    }
+
     G4double Util::BinToEnergy(G4int bin) {
         return fEnergyMin + (fEnergyMax - fEnergyMin) / fNumBins * bin;
     }
 
-    G4bool Util::ExportData(AccumulableMap<G4int> data, G4String filename = "") {
+    G4bool Util::ExportData(AccumulableMap<G4int> data) {
         G4String folder = "output/";
-        if (filename == "") {
-            filename = to_string(time(0)); // Not a guarantee for unix timestamps, but good enough for our purposes
-        }
-        G4String imgExtention = ".bmp";
+        G4String filename = GenUniqueInstanceRunName() + "out";
         
         std::map<G4int,G4int> map = data.GetMap();
 
@@ -82,7 +98,7 @@ namespace lircst {
             }
         }
 
-        bmp.write(ImageView(fNumPixelsX, fNumPixelsY, 1, pixelData.data()), folder + filename + imgExtention);
+        bmp.write(ImageView(fNumPixelsX, fNumPixelsY, 1, pixelData.data()), folder + filename + ".bmp");
 
         return true;
     }

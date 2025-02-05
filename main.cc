@@ -9,6 +9,7 @@
 #include "G4GeometryManager.hh"
 #include "G4GenericBiasingPhysics.hh"
 
+#include "RunManager.hh"
 #include "PhysicsList.hh"
 #include "DetectorConstruction.hh"
 #include "ActionInitialisation.hh"
@@ -26,9 +27,8 @@ int main(int argc,char** argv) {
         G4UIExecutive* ui = nullptr;
         if ( argc > 1 ) { ui = new G4UIExecutive(argc, argv); }
 
-        // Default run manager - manages flow of program, and event loop(s) in a run
-        auto runManager = G4RunManagerFactory::CreateRunManager();
-        // runManager->SetNumberOfThreads(256);
+        // Our run manager - manages flow of program, and event loop(s) in a run
+        auto runManager = new RunManager(std::chrono::system_clock::now().time_since_epoch().count());
 
         // Set must-have user init classes
         auto detector = new DetectorConstruction();
@@ -80,12 +80,13 @@ int main(int argc,char** argv) {
 
             auto timestampStart = (unsigned long)time(NULL);
 
-            int noOfEvents = 1000000000; // 1bil
-            runManager->BeamOn(noOfEvents);
+            int noOfEvents = 10;
+            // Our version of beamOn
+            runManager->ExecuteSimulations(5, noOfEvents);
 
             auto timestampEnd = (unsigned long)time(NULL);
 
-            G4cout << "End of run tee hee, took " << timestampEnd - timestampStart << " seconds" << G4endl;
+            G4cout << "End of runs tee hee, took " << timestampEnd - timestampStart << " seconds" << G4endl;
         }
 
         // Terminate job

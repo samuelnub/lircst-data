@@ -15,9 +15,10 @@ namespace lircst {
 
         void Export();
 
+        static G4double CalculateElectronDensityPerMole(G4Material* material);
+
     private:
         G4Material* FindMaterialAt(G4ThreeVector pos);
-        G4double CalculateElectronDensityPerMole(G4Material* material);
         void WriteToFile(const std::vector<double>& electronDensityData);
 
         G4int fResolution = 1024;

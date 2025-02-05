@@ -11,6 +11,7 @@
 #include "G4SDManager.hh"
 
 #include "EnergySpectScorer.hh"
+#include "RandPhanGen.hh"
 
 #include "Util.hh"
 
@@ -32,7 +33,7 @@ namespace lircst {
         fLogicalWorldVolume = worldLogical;
 
         // Call your phantom construction here
-        auto phantomPhysical = ConstructPhanLungTumour();
+        auto phantomPhysical = ConstructPhanRandom();
         // For importance biasing
         fPhyImportanceVolumes.push_back(phantomPhysical);
 
@@ -119,26 +120,8 @@ namespace lircst {
     }
 
     G4VPhysicalVolume* DetectorConstruction::ConstructPhanRandom() {
-        // Base phantom
-        auto phantomSize = Util::GetPhantomSize();
-        auto phantomSolid = new G4Box("Phantom", phantomSize, phantomSize, phantomSize);
-        auto phantomLogical = new G4LogicalVolume(phantomSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_WATER"), "Phantom");
-        auto phantomPhysical = new G4PVPlacement(0, G4ThreeVector(), phantomLogical, "Phantom", fLogicalWorldVolume, false, 0, true);
-
-        // Randomised spherical inserts in phantom
-        for (int i = 0; i < 5; i++) {
-            // TODO: randomise size
-            auto insertSize = phantomSize / 10;
-            auto insertSolid = new G4Box("Insert", insertSize, insertSize, insertSize);
-            // TODO: randomise material
-            auto insertLogical = new G4LogicalVolume(insertSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_BONE_COMPACT_ICRU"), "Insert");
-            auto x = G4UniformRand() * phantomSize - phantomSize / 2;
-            auto y = G4UniformRand() * phantomSize - phantomSize / 2;
-            auto z = G4UniformRand() * phantomSize - phantomSize / 2;
-            new G4PVPlacement(0, G4ThreeVector(x, y, z), insertLogical, "Insert", phantomLogical, false, 0, true);
-        }
-
-        return phantomPhysical;
+        auto randPhanGen = new RandPhanGen(fLogicalWorldVolume);
+        return randPhanGen->GeneratePhantom();
     }
 
     G4VPhysicalVolume* DetectorConstruction::ConstructPhanLungTumour() {

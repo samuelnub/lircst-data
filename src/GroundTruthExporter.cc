@@ -69,7 +69,7 @@ namespace lircst {
         data.shape = {static_cast<unsigned long>(fResolution), static_cast<unsigned long>(fResolution)};
         data.fortran_order = false;
         
-        const string path{folder + "/" + fFilename};
+        const string path{folder + Util::GenUniqueInstanceRunName() + fFilename};
 
         npy::write_npy(path, data);
     }

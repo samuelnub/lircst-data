@@ -25,8 +25,10 @@ namespace lircst {
             G4cout << "Generating ground truth label" << G4endl;
             GroundTruthExporter().Export();
 
-            // P.S. If you do multiple runs per session, we will accumulate over all runs
-            G4cout << "Begin of global run action" << G4endl;
+            G4cout << "Begin of global run action, resetting accumulables" << G4endl;
+
+            // Reset accumulables
+            G4AccumulableManager::Instance()->Reset();
         }
     }
 
@@ -48,7 +50,7 @@ namespace lircst {
             G4cout << "Final Hits Map Size: " << finalMap.size() << G4endl;
 
             // Export data
-            Util::ExportData(*finalAccumulableMap, "output.out");
+            Util::ExportData(*finalAccumulableMap);
 
             G4cout
             << G4endl
