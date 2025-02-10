@@ -23,13 +23,12 @@ namespace lircst {
 
             // Hey why not generate the ground truth label at the start of the run
             G4cout << "Generating ground truth label" << G4endl;
-            GroundTruthExporter().Export();
-
-            G4cout << "Begin of global run action, resetting accumulables" << G4endl;
-
-            // Reset accumulables
-            G4AccumulableManager::Instance()->Reset();
+            GroundTruthExporter().Export(); // TODO
         }
+
+        // Reset accumulables, regardless of thread
+        G4cout << "Begin of run action, resetting accumulables" << G4endl;
+        G4AccumulableManager::Instance()->Reset();
     }
 
     void RunAction::EndOfRunAction(const G4Run* run) {

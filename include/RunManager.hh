@@ -17,6 +17,8 @@ namespace lircst {
 
         void ExecuteSimulations(G4int nRuns, G4int nEventsPerRun);
 
+        void ResetRun();
+
         // This does NOT change per run - constant throughout the program lifetime
         long GetSeedInstance() {
             return fSeedInstance;

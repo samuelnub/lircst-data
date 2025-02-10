@@ -2,6 +2,7 @@
 
 #include "G4VisManager.hh"
 #include "G4UImanager.hh"
+#include "G4SDManager.hh"
 
 namespace lircst {
     RunManager::RunManager(long seedInstance) : G4MTRunManager(), fSeedInstance(seedInstance) {
@@ -20,10 +21,7 @@ namespace lircst {
         for (G4int i = 0; i < nRuns; i++) {
             SetRandomSeed(fSeedInstance + fRunsThisInstance);
 
-            ReinitializeGeometry(true); // Force geometry to be reinitialized
-            Initialize();
-            InitializeGeometry();
-            GeometryHasBeenModified(); // Let the kernel know that the geometry has been modified
+            ResetRun();
 
             G4cout << "Starting run " << fRunsThisInstance << " with random seed " << GetRandomSeed() << G4endl;
 
@@ -34,4 +32,16 @@ namespace lircst {
         }
     }
 
+    void RunManager::ResetRun() {
+        // Reset the dangling things that we need to reset before we do another run
+
+        G4cout << "Resetting run" << G4endl;
+
+        G4VisManager::GetConcreteInstance()->GeometryHasChanged();
+
+        //InitializeGeometry();
+        GeometryHasBeenModified(); // Let the kernel know that the geometry has been modified
+        ReinitializeGeometry(true); // Force geometry to be reinitialized
+        Initialize();
+    }
 }

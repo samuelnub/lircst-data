@@ -3,6 +3,8 @@
 
 #include "G4Material.hh"
 #include "G4ThreeVector.hh"
+#include "G4Navigator.hh"
+#include "G4TouchableHistoryHandle.hh"
 
 #include <vector>
 #include <fstream>
@@ -20,6 +22,8 @@ namespace lircst {
     private:
         G4Material* FindMaterialAt(G4ThreeVector pos);
         void WriteToFile(const std::vector<double>& electronDensityData);
+
+        G4Navigator* fNavigator = new G4Navigator();
 
         G4int fResolution = 1024;
         G4String fFilename = "gt.npy";

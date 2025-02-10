@@ -3,6 +3,7 @@
 #include "G4Navigator.hh"
 #include "G4TransportationManager.hh"
 #include "G4VPhysicalVolume.hh"
+#include "G4PhysicalVolumeStore.hh"
 
 #include "Util.hh"
 
@@ -10,6 +11,9 @@
 
 namespace lircst {
     void GroundTruthExporter::Export() {
+        // To prevent segfaults after each run
+        fNavigator->SetWorldVolume(G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetWorldVolume());
+
         // Our imaging plane is a square encompassing the phantom at the slice at 0,0,0 with the normal facing upwards
         // We will divide this plane into a grid of fResolution x fResolution
         // We will then calculate the electron density per pixel
@@ -33,8 +37,8 @@ namespace lircst {
     }
 
     G4Material* GroundTruthExporter::FindMaterialAt(G4ThreeVector pos) {
-        G4Navigator* navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
-        G4VPhysicalVolume* volume = navigator->LocateGlobalPointAndSetup(pos);
+        // G4Navigator* navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
+        G4VPhysicalVolume* volume = fNavigator->LocateGlobalPointAndSetup(pos);
         if (!volume) return nullptr;
         return volume->GetLogicalVolume()->GetMaterial();
     }
