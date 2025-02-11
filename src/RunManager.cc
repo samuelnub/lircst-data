@@ -39,14 +39,9 @@ namespace lircst {
 
         G4cout << "Resetting run" << G4endl;
 
-        auto visManager = G4VisManager::GetConcreteInstance();
-        visManager->GeometryHasChanged();
-
         //InitializeGeometry();
         GeometryHasBeenModified(); // Let the kernel know that the geometry has been modified
         ReinitializeGeometry(true); // Force geometry to be reinitialized
         Initialize();
-
-        visManager->DrawGeometry(G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetWorldVolume());
     }
 }
