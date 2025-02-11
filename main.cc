@@ -80,9 +80,9 @@ int main(int argc,char** argv) {
 
             auto timestampStart = (unsigned long)time(NULL);
 
-            int noOfEvents = 10;
+            int noOfEvents = 1000000000;
             // Our version of beamOn
-            runManager->ExecuteSimulations(5, noOfEvents);
+            runManager->ExecuteSimulations(100, noOfEvents);
 
             auto timestampEnd = (unsigned long)time(NULL);
 

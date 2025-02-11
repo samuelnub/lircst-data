@@ -4,6 +4,8 @@
 #include "G4UImanager.hh"
 #include "G4SDManager.hh"
 
+#include "G4TransportationManager.hh"
+
 namespace lircst {
     RunManager::RunManager(long seedInstance) : G4MTRunManager(), fSeedInstance(seedInstance) {
         // Set number of threads
@@ -37,11 +39,14 @@ namespace lircst {
 
         G4cout << "Resetting run" << G4endl;
 
-        G4VisManager::GetConcreteInstance()->GeometryHasChanged();
+        auto visManager = G4VisManager::GetConcreteInstance();
+        visManager->GeometryHasChanged();
 
         //InitializeGeometry();
         GeometryHasBeenModified(); // Let the kernel know that the geometry has been modified
         ReinitializeGeometry(true); // Force geometry to be reinitialized
         Initialize();
+
+        visManager->DrawGeometry(G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetWorldVolume());
     }
 }
