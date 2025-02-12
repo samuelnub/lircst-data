@@ -59,11 +59,12 @@ namespace lircst {
     }
 
     void DetectorConstruction::ConstructSDandField() {
+        // Ignore this, we'll still override our previous one
         if (G4SDManager::GetSDMpointer()->FindSensitiveDetector("mfd", false) != nullptr) {
             G4cout << "Sensitive detector already exists!" << G4endl;
-            return;
+            // return;
         }
-        
+
         // Setup MFD and Primitive Scorer(s)
         auto mfd = new G4MultiFunctionalDetector("mfd");
         G4SDManager::GetSDMpointer()->AddNewDetector(mfd);
