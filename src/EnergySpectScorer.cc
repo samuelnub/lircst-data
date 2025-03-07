@@ -33,11 +33,24 @@ namespace lircst {
 
         // Collimation
 
-        G4ThreeVector momentumDirection = aStep->GetPreStepPoint()->GetMomentumDirection();
-        G4ThreeVector expectedDirection = (fCollPosition - aStep->GetPreStepPoint()->GetPosition()).unit();
-        G4double alignment = std::abs(expectedDirection.dot(momentumDirection));
-        if (alignment < fCollTolerance) return false;
-
+        switch(fScorerType) {
+            case ScorerType::Parallel: {
+                G4ThreeVector momentumDirection = aStep->GetPreStepPoint()->GetMomentumDirection();
+                G4double alignment = fParallelCollNormal.dot(momentumDirection);
+                if (alignment < fCollTolerance) return false;
+                break;
+            }
+            case ScorerType::Pinhole: {
+                G4ThreeVector momentumDirection = aStep->GetPreStepPoint()->GetMomentumDirection();
+                G4ThreeVector expectedDirection = (fCollPosition - aStep->GetPreStepPoint()->GetPosition()).unit();
+                G4double alignment = std::abs(expectedDirection.dot(momentumDirection));
+                if (alignment < fCollTolerance) return false;
+                break;
+            }
+            default: {
+                break;
+            }
+        }
 
         // Get pos of the step, and what pixel that corresponds to
         // Get local pos - local to touchable!
