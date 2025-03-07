@@ -17,12 +17,27 @@
 
 #include <chrono>
 
+#include <stdio.h>
+#include <execinfo.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 #include "Util.hh"
 
 using namespace lircst;
 
 // Based on https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/GettingStarted/mainProgram.html
 int main(int argc,char** argv) {
+    // Install a segfault handler
+    signal(SIGSEGV, [](int sig) {
+        void *array[10];
+        size_t size = backtrace(array, 10);
+        fprintf(stderr, "Error: signal %d:\n", sig);
+        backtrace_symbols_fd(array, size, STDERR_FILENO);
+        exit(1);
+    });
+
     try {
         G4UIExecutive* ui = nullptr;
         if ( argc > 1 ) { ui = new G4UIExecutive(argc, argv); }
