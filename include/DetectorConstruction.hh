@@ -18,6 +18,7 @@ namespace lircst {
         ~DetectorConstruction() override = default;
 
         G4VPhysicalVolume* Construct() override;
+        void SetGantryAngle(G4double angle);
         void ConstructSDandField() override;
 
         G4VPhysicalVolume* GetWorldVolume() const { return fPhysicalWorldVolume; }
@@ -34,8 +35,10 @@ namespace lircst {
     protected:
         G4LogicalVolume* fLogicalWorldVolume = nullptr;
         G4LogicalVolume* fLogicalScoringVolume = nullptr;
+        G4VPhysicalVolume* fPhysicalGantryVolume = nullptr;
+        G4VPhysicalVolume* fPhysicalScoringVolume = nullptr;
         G4VPhysicalVolume* fPhysicalWorldVolume = nullptr;
-        std::vector<G4VPhysicalVolume*> fPhyImportanceVolumes;
+        std::vector<G4VPhysicalVolume*> fPhyImportanceVolumes; // TODO: unused
     };
 }
 

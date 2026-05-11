@@ -22,7 +22,7 @@ namespace lircst {
         G4PVPlacement* GeneratePhantom();
 
     private:
-        G4int fMaxNumInserts = 10;
+        G4int fMaxNumInserts = 50;
         G4int fMaxRetries = 10;
         G4LogicalVolume* fLogicalWorldVol;
         std::vector<G4LogicalVolume*> fParentInserts; // Potential parent volumes for inserts

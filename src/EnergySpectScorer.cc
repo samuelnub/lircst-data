@@ -12,10 +12,6 @@ namespace lircst {
         fEMin = eMin;
         fEMax = eMax;
 
-        G4ThreeVector SDPosition = G4ThreeVector(0, Util::GetWorldSize() * Util::GetWorldGunSDRatio(), 0);        
-        G4ThreeVector incidentIntersection = G4ThreeVector(0,0,0); // With our setup, the intersection point is the centre of our world
-        fCollPosition = Util::GetCollSDToIncidentRatio() * (SDPosition + incidentIntersection);
-
         fCollTolerance = std::cos(Util::GetCollCosAcceptanceDeg() * deg);
     }
 
@@ -58,8 +54,8 @@ namespace lircst {
         G4ThreeVector worldPos = aStep->GetPreStepPoint()->GetPosition();
         G4ThreeVector pos = touchable->GetHistory()->GetTopTransform().TransformPoint(worldPos);
 
-        G4int i = static_cast<G4int>((pos.x() - x_min) / pixel_size_x);
-        G4int j = static_cast<G4int>((pos.y() - y_min) / pixel_size_y);
+        G4int i = static_cast<G4int>((pos.y() - x_min) / pixel_size_w);
+        G4int j = static_cast<G4int>((pos.z() - y_min) / pixel_size_h);
         if (i < 0 || i >= fNx || j < 0 || j >= fNy) return false; // Out of bounds
 
         // Determine enregy bin

@@ -28,6 +28,13 @@ namespace lircst {
         return G4RandGauss::shoot(mean, sigma);
     }
 
+    G4ThreeVector Util::GetPosFromThetaRotation(G4double theta, G4double radius) {
+        // Rotate around the centre of the world (which is also the centre of the phantom)
+        G4double x = radius * cos(theta);
+        G4double y = radius * sin(theta);
+        return G4ThreeVector(x, y, 0);
+    }
+
     G4String Util::GenUniqueInstanceRunName() {
         auto name = std::to_string(G4Random::getTheSeed());
         return name;

@@ -31,7 +31,7 @@ namespace lircst {
         G4int fNx, fNy, fNbins;    // Pixel grid and energy bins
         G4double fEMin, fEMax;     // Energy range
         const G4double x_min = -(Util::GetScorerSize() / 2), y_min = -(Util::GetScorerSize() / 2);
-        const G4double pixel_size_x = Util::GetScorerSize() / Util::GetNumPixelsX(), pixel_size_y = Util::GetScorerSize() / Util::GetNumPixelsY();
+        const G4double pixel_size_w = Util::GetScorerSize() / Util::GetNumPixelsX(), pixel_size_h = Util::GetScorerSize() / Util::GetNumPixelsY();
 
         G4THitsMap<G4double>* fHitsMap = nullptr;
 

@@ -10,12 +10,6 @@
 #include <random>
 
 namespace lircst {
-    enum SourceType {
-        Pencil = 0,
-        Parallel2D = 1,
-        Parallel3D = 2,
-        Cone = 3,
-    };
 
     enum SpectrumType {
         Mono = 0,
@@ -27,11 +21,13 @@ namespace lircst {
         PrimaryGeneratorAction();
         ~PrimaryGeneratorAction() override = default;
 
+        void SetGantryAngle(G4double angle) { fGantryAngle = angle; }
         void GeneratePrimaries(G4Event*) override;
 
     private:
-        SourceType fSourceType = SourceType::Cone;
-        SpectrumType fSpectrumType = SpectrumType::Poly;
+        SpectrumType fSpectrumType = SpectrumType::Mono;
+
+        G4double fGantryAngle = 45 * deg; //0.0 * radian;
 
         beta_distribution<> fBetaDist = beta_distribution<>(2.0, 4.0); // According to Analytical parameters
         G4float fBetaMaxEnergy = 0.120 * MeV; // According to Analytical parameters
