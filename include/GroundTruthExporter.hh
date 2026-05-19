@@ -16,7 +16,8 @@ namespace lircst {
         GroundTruthExporter() = default;
         ~GroundTruthExporter() = default;
 
-        void Export(G4int slice = 0); // Exports the first slice by default
+        std::vector<double>& Export(G4int slice = 0); // Exports the first slice by default
+        void ExportFullVolume(); // Exports the full 3D volume, not just a slice
 
         static G4double CalculateElectronDensityPerMole(G4Material* material);
         static G4double CalculateLinearAttenuation(G4Material* material, G4double energy, G4EmCalculator& emCalc);
@@ -28,7 +29,7 @@ namespace lircst {
         G4Navigator* fNavigator = new G4Navigator();
 
         G4int fResolution = 128;
-        G4String fFilename = "gt.npy";
+        G4String fFilenameSuffix = ".npy";
     };
 }
 

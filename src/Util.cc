@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <ctime>
+#include <filesystem>
 
 #include "npy.hh"
 #include "BMPMini.hh"
@@ -12,6 +13,10 @@ using namespace std;
 using namespace image;
 
 namespace lircst {
+    G4String Util::GetInstanceRunName() {
+        return std::to_string(G4Random::getTheSeed()); // Uhh... This is the same as GenUniqueInstanceRunName, but I guess it makes more sense to have a separate function for this that explicitly says it's the run name, and then GenUniqueInstanceRunName can be used for other purposes if we want
+    }
+
     G4int Util::GenMapKey(G4int x, G4int y, G4int bin) {
         return x + fNumPixelsY * (y + fNumPixelsY * bin);
     }
@@ -44,9 +49,10 @@ namespace lircst {
         return fEnergyMin + (fEnergyMax - fEnergyMin) / fNumBins * bin;
     }
 
-    G4bool Util::ExportData(AccumulableMap<G4int> data) {
-        G4String folder = "output/";
-        G4String filename = GenUniqueInstanceRunName() + "out";
+    G4bool Util::ExportData(AccumulableMap<G4int> data, G4String name) {
+        G4String folder = "output/" + GetInstanceRunName() + "/"; // Create a subfolder for this run
+        G4String filename = name;
+        CreateDirectory(folder); // Ensure the output directory exists before writing files
         
         std::map<G4int,G4int> map = data.GetMap();
 
@@ -88,6 +94,7 @@ namespace lircst {
 
         // For image export, integrate over energy bins
         // This is mainly for visualisation (our real data that we will learn over, is the 3D tensors eventually)
+        /*
         BMPMini bmp;
 
         vector<uint8_t> pixelData(fNumPixelsX * fNumPixelsY); // Grayscale, 1 channel
@@ -106,7 +113,22 @@ namespace lircst {
         }
 
         bmp.write(ImageView(fNumPixelsX, fNumPixelsY, 1, pixelData.data()), folder + filename + ".bmp");
-
+        */
+       
         return true;
+    }
+
+    G4bool Util::CreateDirectory(G4String path) {
+        // C++17 way to create directory
+        try {
+            if (!filesystem::exists(std::string(path))) {
+                filesystem::create_directory(std::string(path));
+                G4cout << "Directory created: " << path << G4endl;
+            }
+            return true;
+        } catch (const std::filesystem::filesystem_error& e) {
+            G4cerr << "Error creating directory: " << e.what() << G4endl;
+            return false;
+        }
     }
 }

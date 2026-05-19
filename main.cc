@@ -97,11 +97,11 @@ int main(int argc,char** argv) {
 
             int noOfEvents = 1*pow(10, 7);
             // Our version of beamOn
-            runManager->ExecuteSimulations(2, noOfEvents);
+            runManager->ExecuteFullRotation(noOfEvents);
 
             auto timestampEnd = (unsigned long)time(NULL);
 
-            G4cout << "End of runs tee hee, took " << timestampEnd - timestampStart << " seconds" << G4endl;
+            G4cout << "End of run(s) tee hee, took " << timestampEnd - timestampStart << " seconds" << G4endl;
         }
 
         // Terminate job

@@ -2,9 +2,10 @@
 #include "G4Event.hh"
 #include "G4ios.hh"
 #include "G4SDManager.hh"
-#include "G4RunManager.hh"
+#include "G4MTRunManager.hh"
 #include "G4THitsMap.hh"
 
+#include "RunManager.hh"
 #include "RunAction.hh"
 
 namespace lircst {
@@ -27,7 +28,9 @@ namespace lircst {
         if (!hitsMap) return;
 
         // So cursed
-        auto runAction = static_cast<RunAction*>(const_cast<G4UserRunAction*>(G4RunManager::GetRunManager()->GetUserRunAction()));
+        auto runManager = static_cast<RunManager*>(G4MTRunManager::GetRunManager()); // We might want the worker run manager as opposed to the master one here
+        auto runAction = static_cast<RunAction*>(const_cast<G4UserRunAction*>(runManager->GetUserRunAction()));
+
         runAction->AddHitsMap(hitsMap);
     }
 }

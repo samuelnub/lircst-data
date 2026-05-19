@@ -6,12 +6,14 @@
 #include "G4PhysicalVolumeStore.hh"
 #include "CLHEP/Units/PhysicalConstants.h"
 
+#include "G4GenericMessenger.hh"
+
 #include "Util.hh"
 
 #include "npy.hh"
 
 namespace lircst {
-    void GroundTruthExporter::Export(G4int slice) {
+    std::vector<double>& GroundTruthExporter::Export(G4int slice) {
         // To prevent segfaults after each run
         fNavigator->SetWorldVolume(G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetWorldVolume());
 
@@ -41,7 +43,18 @@ namespace lircst {
             }
         }
 
-        WriteToFile(elecDensAndLinAttenData);
+        return elecDensAndLinAttenData;
+    }
+
+    void GroundTruthExporter::ExportFullVolume() {
+        // Call on our existing slice-by-slice export function, but for each slice, and concatenate results
+        G4cout << "Exporting full volume..." << G4endl;
+        std::vector<double> fullVolumeData(2 * fResolution * fResolution * fResolution, 0.0f); // 2 channels: 0 = electron density, 1 = linear attenuation  
+        for (int slice = 0; slice < fResolution; slice++) {
+            std::vector<double>& sliceData = Export(slice);
+            std::copy(sliceData.begin(), sliceData.end(), fullVolumeData.begin() + slice * 2 * fResolution * fResolution);
+        }
+        WriteToFile(fullVolumeData);
     }
 
     G4Material* GroundTruthExporter::FindMaterialAt(G4ThreeVector pos) {
@@ -78,18 +91,19 @@ namespace lircst {
     }
 
     void GroundTruthExporter::WriteToFile(const std::vector<double>& elecDensAndLinAttenData) {
-        G4String folder = "output/";
-        
+        G4String folder = "output/" + Util::GetInstanceRunName() + "/"; // Create a subfolder for this run
+        Util::CreateDirectory(folder); // Ensure the output directory exists before writing files
+
         npy::npy_data_ptr<double> data;
 
         data.data_ptr = elecDensAndLinAttenData.data();
 
         // 2 channels: 0 = electron density, 1 = linear attenuation
-        // Followed by x and y dimensions of the image
-        data.shape = {2, static_cast<unsigned long>(fResolution), static_cast<unsigned long>(fResolution)};
+        // Followed by x and y and z dimensions of the phantom
+        data.shape = {2, static_cast<unsigned long>(fResolution), static_cast<unsigned long>(fResolution), static_cast<unsigned long>(fResolution)}; // Note: Geant4 box dimensions are half-widths, remember!
         data.fortran_order = false;
         
-        const string path{folder + Util::GenUniqueInstanceRunName() + fFilename};
+        const string path{folder + "phan" + fFilenameSuffix};
 
         npy::write_npy(path, data);
     }

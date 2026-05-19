@@ -2,7 +2,9 @@
 #include "G4Gamma.hh"
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
+#include "G4MTRunManager.hh"
 
+#include "RunManager.hh"
 #include "Util.hh"
 
 #include "Randomize.hh"
@@ -26,16 +28,20 @@ namespace lircst {
 
     void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
         // Set particle pos / dir
-        if (fSpectrumType == SpectrumType::Poly) {
-            G4double particleEnergy = fBetaDist(gen) * fBetaMaxEnergy;
-            this->fParticleGun->SetParticleEnergy(particleEnergy);
-        }
+
+        //if (fSpectrumType == SpectrumType::Poly) {
+        //    G4double particleEnergy = fBetaDist(gen) * fBetaMaxEnergy;
+        //    this->fParticleGun->SetParticleEnergy(particleEnergy);
+        //}
+
+        auto runManager = static_cast<RunManager*>(G4MTRunManager::GetMasterRunManager());
+        G4double gantryAngle = runManager->GetCurrentGantryAngleRad();
 
         // Rotating gantry around Z axis
         G4double radius = Util::GetSourceDistIsocenter();
         G4ThreeVector pos(
-            radius * std::cos(fGantryAngle),
-            radius * std::sin(fGantryAngle),
+            radius * std::cos(gantryAngle),
+            radius * std::sin(gantryAngle),
             0
         );
 

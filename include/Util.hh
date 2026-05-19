@@ -17,6 +17,8 @@ namespace lircst {
 
     class Util {
     public:
+        static G4String GetInstanceRunName();
+
         static G4int GenMapKey(G4int x, G4int y, G4int bin);
 
         static G4int GenRandomInt(G4int min, G4int max);
@@ -29,7 +31,9 @@ namespace lircst {
 
         static G4double BinToEnergy(G4int bin);
 
-        static G4bool ExportData(AccumulableMap<G4int> data);
+        static G4bool ExportData(AccumulableMap<G4int> data, G4String name);
+
+        static G4bool CreateDirectory(G4String path);
 
         static const G4int GetNumPixelsX() { return fNumPixelsX; } 
         static const G4int GetNumPixelsY() { return fNumPixelsY; }
@@ -55,7 +59,7 @@ namespace lircst {
         static constexpr G4double fEnergyMin = 0.324 * MeV;
         static constexpr G4double fEnergyMax = 0.353 * MeV; // According to angle alpha based on how far the source is from the isocentre and the width of the phantom
         static constexpr G4double fScorerSize = 12.8 * cm / 2.0; // Make sure that each pixel is roughly 1mm x 1mm
-        static constexpr G4double fWorldSize = 150.0 * cm;
+        static constexpr G4double fWorldSize = 110.0 * cm; // Half-length of box
         static constexpr G4double fPhantomSize = 12.8 * cm / 2.0; // Geant4 box dimensions are half-widths, remember!
         static constexpr G4double fDetecDistIsocenter = 50.0 * cm;
         static constexpr G4double fSourceDistIsocenter = 100.0 * cm;

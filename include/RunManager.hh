@@ -10,7 +10,7 @@
 namespace lircst {
     class RunManager : public G4MTRunManager { // We going multi-threaded
     public:
-        RunManager(long seedInstance);
+        RunManager(long seedInstance, G4int currentGantryIndex=0);
         ~RunManager() override = default;
 
         // We treat this as an ExecuteSimulations but just 1 run
@@ -40,8 +40,21 @@ namespace lircst {
         G4int GetNThetaSteps() {
             return nThetaSteps;
         }
-        G4double GetCurrentGantryAngle() {
-            return fCurrentGantryAngle;
+        G4double GetCurrentGantryAngleRad() {
+            G4double angle = minGantryAngle + fCurrentGantryIndex * (maxGantryAngle - minGantryAngle) / nThetaSteps;
+            return angle;
+        }
+
+        G4int GetCurrentGantryIndex() {
+            return fCurrentGantryIndex;
+        }
+
+        void IncrementGantryIndex() {
+            fCurrentGantryIndex = (fCurrentGantryIndex + 1); //% nThetaSteps;
+        }
+
+        G4bool IsFullRotationComplete() {
+            return GetCurrentGantryAngleRad() >= maxGantryAngle;
         }
 
     private:
@@ -57,10 +70,10 @@ namespace lircst {
         G4int fRunsThisInstance = 0;
         G4GenericMessenger* fMessenger;
 
-        const G4double minGantryAngle = 0 * deg;
-        const G4double maxGantryAngle = 180 * deg;
+        const G4double minGantryAngle = 0.0 * rad;
+        const G4double maxGantryAngle = CLHEP::pi * rad; // 180 degrees in radians
         const G4int nThetaSteps = 200;
-        G4double fCurrentGantryAngle = minGantryAngle;
+        G4int fCurrentGantryIndex = 0;
     };
 }
 

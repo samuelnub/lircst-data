@@ -18,7 +18,7 @@ namespace lircst {
         ~DetectorConstruction() override = default;
 
         G4VPhysicalVolume* Construct() override;
-        void SetGantryAngle(G4double angle);
+        void SetGantryAngle(G4double angle, G4bool updateGeom=true);
         void ConstructSDandField() override;
 
         G4VPhysicalVolume* GetWorldVolume() const { return fPhysicalWorldVolume; }

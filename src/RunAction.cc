@@ -7,9 +7,10 @@
 #include "G4MultiFunctionalDetector.hh"
 #include "G4Event.hh"
 #include "G4AccumulableManager.hh"
+#include "G4MTRunManager.hh"
 
+#include "RunManager.hh"
 #include "EnergySpectScorer.hh"
-
 #include "GroundTruthExporter.hh"
 
 namespace lircst {
@@ -22,8 +23,8 @@ namespace lircst {
         if (IsMaster()) {
 
             // Hey why not generate the ground truth label at the start of the run
-            G4cout << "Generating ground truth label" << G4endl;
-            GroundTruthExporter().Export(); // TODO
+            // G4cout << "Generating ground truth label" << G4endl;
+            // GroundTruthExporter().Export(); // TODO we'll instead export the Whole phantom outside of this RunAction
         }
 
         // Reset accumulables, regardless of thread
@@ -49,7 +50,10 @@ namespace lircst {
             G4cout << "Final Hits Map Size: " << finalMap.size() << G4endl;
 
             // Export data
-            Util::ExportData(*finalAccumulableMap);
+            auto runManager = static_cast<RunManager*>(G4MTRunManager::GetMasterRunManager());
+            auto currentGantryIndex = runManager->GetCurrentGantryIndex();
+            // Theta index output
+            Util::ExportData(*finalAccumulableMap, std::to_string(currentGantryIndex) + "-ti-out");
 
             G4cout
             << G4endl
@@ -72,6 +76,7 @@ namespace lircst {
             G4int key = iter->first;
             // G4double value = *(iter->second);
             // We just count photons
+            // TODO: record more data than just counts? Or maybe not, as we already have i,j,bin info
             fAccumulatedHitsMap.AddValue(key, 1);
         }
     }

@@ -9,9 +9,12 @@
 #include "Randomize.hh"
 #include "G4MultiFunctionalDetector.hh"
 #include "G4SDManager.hh"
+#include "G4GeometryManager.hh"
+#include "G4RunManager.hh"
 
 #include "EnergySpectScorer.hh"
 #include "RandPhanGen.hh"
+#include "PrimaryGeneratorAction.hh"
 
 #include "Util.hh"
 
@@ -32,8 +35,11 @@ namespace lircst {
 
         fLogicalWorldVolume = worldLogical;
 
+        // =============================================
         // Call your phantom construction here
-        auto phantomPhysical = ConstructPhanRandom();
+        auto phantomPhysical = ConstructPhanLungTumour();
+        // =============================================
+
         // For importance biasing
         //fPhyImportanceVolumes.push_back(phantomPhysical);
 
@@ -59,17 +65,26 @@ namespace lircst {
         //fPhyImportanceVolumes.push_back(scoringVolumePhysical);
 
         // TODO: temp
-        this->SetGantryAngle(315 * deg);
+        this->SetGantryAngle(0 * rad, false);
 
         // Always return physical world
         return worldPhysical;
     }
 
-    void DetectorConstruction::SetGantryAngle(G4double angle) {
+    void DetectorConstruction::SetGantryAngle(G4double angle, G4bool updateGeom) {
         if(fPhysicalGantryVolume) {
+            if (updateGeom) {
+                G4GeometryManager::GetInstance()->OpenGeometry(fPhysicalGantryVolume);
+            }
+
             auto rotation = new G4RotationMatrix();
-            rotation->rotateZ(angle);
+            rotation->rotateZ(-angle); // Minus angle because it didn't seem to align with the particle generator
             fPhysicalGantryVolume->SetRotation(rotation);
+            // Needs a geometry reinitialisation after this!
+
+            if (updateGeom) {
+                G4GeometryManager::GetInstance()->CloseGeometry(fPhysicalGantryVolume);
+            }
         } else {
             G4cerr << "Gantry volume not constructed yet!" << G4endl;
         }

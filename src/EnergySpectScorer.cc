@@ -23,7 +23,7 @@ namespace lircst {
     }
 
     G4bool EnergySpectScorer::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
-        // Get energy deposited in this step
+        // Get energy in this step
         G4double energy = aStep->GetPreStepPoint()->GetKineticEnergy();
         if (energy == 0) return false;
 

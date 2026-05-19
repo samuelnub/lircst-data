@@ -8,9 +8,11 @@
 
 #include "GroundTruthExporter.hh"
 
+#include "Util.hh"
+
 namespace lircst {
     G4PVPlacement* RandPhanGen::GeneratePhantom() {
-        G4cout << "Generating random phantom with seed " << G4Random::getTheSeed() << G4endl;
+        G4cout << "Generating random phantom with seed " << Util::GetInstanceRunName() << G4endl;
 
         auto phantomSize = Util::GetPhantomSize();
 
