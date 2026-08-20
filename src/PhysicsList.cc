@@ -23,6 +23,7 @@ namespace lircst {
     }
 
     void PhysicsList::ConstructProcess() {
+        G4cout << "Constructing physics processes..." << G4endl;
         this->AddTransportation();
 
         auto physicsHelper = G4PhysicsListHelper::GetPhysicsListHelper();

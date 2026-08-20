@@ -27,7 +27,6 @@ namespace lircst {
 
         std::vector<double> elecDensAndLinAttenData(2 * fResolution * fResolution, 0.0f); // 2 channels: 0 = electron density, 1 = linear attenuation
 
-
         G4EmCalculator emCalc;
 
         G4double sliceZ = -imagingPlaneWidth + halfPixelWidth + slice * pixelWidth; // Calculate Z position of the slice we want to export

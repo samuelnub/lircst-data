@@ -3,6 +3,7 @@
 #include "PrimaryGeneratorAction.hh"
 #include "EventAction.hh"
 #include "RunAction.hh"
+//#include "SteppingAction.hh"
 
 namespace lircst {
     void ActionInitialisation::BuildForMaster() const {
@@ -13,5 +14,6 @@ namespace lircst {
         SetUserAction(new RunAction);
         SetUserAction(new EventAction);
         SetUserAction(new PrimaryGeneratorAction);
+        //SetUserAction(new SteppingAction);
     }
 }

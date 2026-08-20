@@ -5,6 +5,7 @@
 #include "G4Accumulable.hh"
 #include "G4THitsMap.hh"
 #include "AccumulableMap.hh"
+#include "G4VPhysicalVolume.hh"
 
 namespace lircst {
     class RunAction : public G4UserRunAction {
@@ -15,6 +16,8 @@ namespace lircst {
         void BeginOfRunAction(const G4Run* run) override;
         void EndOfRunAction(const G4Run* run) override;
         void AddHitsMap(G4THitsMap<G4double>* hitsMap);
+
+        void DumpGeometry(const G4VPhysicalVolume* pv, int depth);
 
     private:
         AccumulableMap<G4int> fAccumulatedHitsMap = AccumulableMap<G4int>("AccumulatedHitsMap");

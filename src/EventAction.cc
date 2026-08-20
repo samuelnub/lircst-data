@@ -27,6 +27,11 @@ namespace lircst {
         auto hitsMap = static_cast<G4THitsMap<G4double>*>(hce->GetHC(hcID));
         if (!hitsMap) return;
 
+        if (hitsMap->size() == 0) return;
+
+        G4cout << "In EventAction::EndOfEventAction, event ID: " << event->GetEventID() << ", hits map size: " << hitsMap->size() << " from hCID " << hcID << G4endl;
+
+
         // So cursed
         auto runManager = static_cast<RunManager*>(G4MTRunManager::GetRunManager()); // We might want the worker run manager as opposed to the master one here
         auto runAction = static_cast<RunAction*>(const_cast<G4UserRunAction*>(runManager->GetUserRunAction()));

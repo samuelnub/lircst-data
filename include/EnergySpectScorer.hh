@@ -26,8 +26,6 @@ namespace lircst {
     private:
         ScorerType fScorerType = ScorerType::Parallel;
 
-        G4ThreeVector fParallelCollNormal = G4ThreeVector(0, 1, 0);
-
         G4int fNx, fNy, fNbins;    // Pixel grid and energy bins
         G4double fEMin, fEMax;     // Energy range
         const G4double x_min = -(Util::GetScorerSize() / 2), y_min = -(Util::GetScorerSize() / 2);

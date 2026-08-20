@@ -37,6 +37,8 @@ namespace lircst {
         auto runManager = static_cast<RunManager*>(G4MTRunManager::GetMasterRunManager());
         G4double gantryAngle = runManager->GetCurrentGantryAngleRad();
 
+        gantryAngle -= Util::GetGunAngleOffset(); // Mainly for debugging purposes, for our CST system, it should subtract 0.0f
+
         // Rotating gantry around Z axis
         G4double radius = Util::GetSourceDistIsocenter();
         G4ThreeVector pos(

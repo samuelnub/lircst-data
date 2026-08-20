@@ -9,6 +9,8 @@
 #include "G4AccumulableManager.hh"
 #include "G4MTRunManager.hh"
 
+#include "G4TransportationManager.hh"
+
 #include "RunManager.hh"
 #include "EnergySpectScorer.hh"
 #include "GroundTruthExporter.hh"
@@ -30,6 +32,33 @@ namespace lircst {
         // Reset accumulables, regardless of thread
         G4cout << "Begin of run action, resetting accumulables" << G4endl;
         G4AccumulableManager::Instance()->Reset();
+
+        // For debugging, dump the geometry tree
+        //auto worldVol = G4TransportationManager::GetInstanceIfExist()->GetNavigatorForTracking()->GetWorldVolume();
+        //DumpGeometry(worldVol, 0);
+    }
+
+    void RunAction::DumpGeometry(const G4VPhysicalVolume* pv, int depth) {
+        if (!pv)
+            return;
+
+        auto* lv = pv->GetLogicalVolume();
+        auto* sd = lv->GetSensitiveDetector();
+
+        G4cout
+            << std::string(depth, ' ')
+            << pv->GetName()
+            << "  LV=" << lv->GetName()
+            << "  SD=" << (sd ? sd->GetName() : "NONE")
+            << G4endl;
+
+        auto noDaughters = lv->GetNoDaughters();
+
+        for (std::size_t i = 0; i < noDaughters; i++)
+        {
+            auto* daughter = lv->GetDaughter(i);
+            DumpGeometry(daughter, depth + 2);
+        }
     }
 
     void RunAction::EndOfRunAction(const G4Run* run) {

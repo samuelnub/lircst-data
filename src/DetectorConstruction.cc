@@ -11,19 +11,26 @@
 #include "G4SDManager.hh"
 #include "G4GeometryManager.hh"
 #include "G4RunManager.hh"
+#include "G4MTRunManager.hh"
+
+#include "G4PSDoseDeposit.hh" // TODO: temp test to see if our ESS is what's broken
 
 #include "EnergySpectScorer.hh"
 #include "RandPhanGen.hh"
 #include "PrimaryGeneratorAction.hh"
+#include "RunManager.hh"
 
 #include "Util.hh"
 
 #include <cmath>
+#include <memory>
 
 namespace lircst {
     DetectorConstruction::DetectorConstruction() : G4VUserDetectorConstruction() {}
 
     G4VPhysicalVolume* DetectorConstruction::Construct() {
+        G4cout << "Constructing geometry..." << G4endl;
+
         // World
         auto worldSize = Util::GetWorldSize();
         auto worldSolid = new G4Box("World", worldSize, worldSize, worldSize);
@@ -54,18 +61,25 @@ namespace lircst {
         auto scoringVolumeRotation = new G4RotationMatrix();
 
         // Gantry that we attach the scoring volume to, so that rotations are a lot easier
-        auto gantrySolid = new G4Box("Gantry", scoringVolumeSize / 4, scoringVolumeSize / 4, scoringVolumeSize / 4);
+        auto gantrySolid = new G4Tubs(
+            "Gantry",
+            scoringVolumeDistFromCentre - (scoringVolumeSize), // magic number to allow leeway so that entire scorer should be enveloped by this tub
+            scoringVolumeDistFromCentre + (scoringVolumeSize), // magic number to allow leeway so that entire scorer should be enveloped by this tub
+            scoringVolumeSize * 1.2,
+            0 * rad,
+            2 * CLHEP::pi * rad // TODO: magic number
+        );
         auto gantryLogical = new G4LogicalVolume(gantrySolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_AIR"), "Gantry");
-        fPhysicalGantryVolume = new G4PVPlacement(0, G4ThreeVector(0, 0, scoringVolumeDistFromCentre), gantryLogical, "Gantry", worldLogical, false, 0);
+        fPhysicalGantryVolume = new G4PVPlacement(0, G4ThreeVector(0, 0, 0), gantryLogical, "Gantry", worldLogical, false, 0);
 
         auto scoringVolumeSolid = new G4Box("ScoringVolume", scoringVolumeSize, scoringVolumeSize / 8, scoringVolumeSize); // TODO: magic number
         fLogicalScoringVolume = new G4LogicalVolume(scoringVolumeSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_Pb"), "ScoringVolume");
-        fPhysicalScoringVolume = new G4PVPlacement(scoringVolumeRotation, G4ThreeVector(0, scoringVolumeDistFromCentre, -scoringVolumeDistFromCentre), fLogicalScoringVolume, "ScoringVolume", gantryLogical, false, 0);
+        fPhysicalScoringVolume = new G4PVPlacement(scoringVolumeRotation, G4ThreeVector(0, scoringVolumeDistFromCentre, 0), fLogicalScoringVolume, "ScoringVolume", gantryLogical, false, 0);
         // For importance biasing
         //fPhyImportanceVolumes.push_back(scoringVolumePhysical);
 
         // TODO: temp
-        this->SetGantryAngle(0 * rad, false);
+        //this->SetGantryAngle(0 * rad, false);
 
         // Always return physical world
         return worldPhysical;
@@ -91,69 +105,76 @@ namespace lircst {
     }
 
     void DetectorConstruction::ConstructSDandField() {
-        // Ignore this, we'll still override our previous one
-        if (G4SDManager::GetSDMpointer()->FindSensitiveDetector("mfd", false) != nullptr) {
-            G4cout << "Sensitive detector already exists!" << G4endl;
-            // return;
-        }
+        // Do we need to construct a new SD for each theta in a rotation? 
+        G4cout << "SD and field construction... runmanager type: " << G4RunManager::GetRunManager()->GetRunManagerType() << " current SD pointer: " << G4SDManager::GetSDMpointer()->FindSensitiveDetector("mfd", false) << G4endl;
+
+        // Unreliable way of checking if mfd already exists, as worker threads may report a non-nullptr address for this mfd, when in fact it has never been initialised
+        //auto oldMfd = G4SDManager::GetSDMpointer()->FindSensitiveDetector("mfd", false);
+        /*
+        if (G4RunManager::GetRunManager()->GetRunManagerType() == G4RunManager::masterRM ) {
+            // G4RunManager::GetRunManager()->GetRunManagerType() == G4RunManager::sequentialRM) { // We might want to test non-MT geant4
+            G4cout << "In non-worker thread, not constructing SD" << G4endl;
+            return;
+        }*/
+        /*
+        if (fMFDConstructed) {
+            G4cout << "MFD already constructed, skipping..." << G4endl;
+            return;
+        }*/
+        G4cout << "Constructing SD and field..." << G4endl;
 
         // Setup MFD and Primitive Scorer(s)
         auto mfd = new G4MultiFunctionalDetector("mfd");
         G4SDManager::GetSDMpointer()->AddNewDetector(mfd);
         // Add primitive scorer(s)
+        
+        // TODO: testing primitive scorer
+        //auto energySpectScorer = new G4PSDoseDeposit("ess");
+
+        
         auto energySpectScorer = new EnergySpectScorer(
                                                         "ess",
                                                         Util::GetNumPixelsX(),
                                                         Util::GetNumPixelsY(),
                                                         Util::GetNumBins(),
                                                         Util::GetEnergyMin(),
-                                                        Util::GetEnergyMax()); // pretty low (medical)
+                                                        Util::GetEnergyMax()); // pretty low (medical) 
         mfd->RegisterPrimitive(energySpectScorer);
-        SetSensitiveDetector(fLogicalScoringVolume, mfd);
+        SetSensitiveDetector("ScoringVolume", mfd); // Give pointer to ScoringVolume? Or str name?
+        G4cout << "SD and field construction done! Current MFD pointer: " << mfd << " and SD pointer " << G4SDManager::GetSDMpointer()->FindSensitiveDetector("mfd", false) << G4endl;
     }
 
     void DetectorConstruction::ConstructImportanceVolumes() {
-
         // UNUSED
         return;
-
         // Logical slabs
         int numSlabs = 16;
-
         G4double boundUpper = Util::GetDetecDistIsocenter() - (Util::GetScorerSize() / 8); // TODO: magic number
         G4double boundLower = Util::GetPhantomSize(); // Remember! Geant4 box dimensions are half-lengths! Why? IDK
         G4double slabY = ((boundUpper - boundLower) / numSlabs) / 2; // Half-size
-
         for(int i = 0; i < numSlabs; i++) {
             auto slabXZ = Util::GetScorerSize(); // TODO: placeholder until i can get it to look nice
-            
             auto slabSolid = new G4Box("ISlab", slabXZ, slabY, slabXZ);
             auto slabLogical = new G4LogicalVolume(slabSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_AIR"), "ISlab");
             auto slabPhysical = new G4PVPlacement(0, G4ThreeVector(0, boundLower + slabY + i * 2 * slabY, 0), slabLogical, "ISlab", fLogicalWorldVolume, false, 0, true);
-
             fPhyImportanceVolumes.push_back(slabPhysical);
         }
     }
 
     G4VIStore* DetectorConstruction::CreateImportanceStore() {
-
         // UNUSED
         return nullptr;
-        
         if(!fPhyImportanceVolumes.size()) {
             G4cerr << "No importance volumes to create store for!" << G4endl;
             return nullptr;
         }
         G4IStore* iStore = G4IStore::GetInstance();
-
         /* TODO: Clear this up because we won't be using importance biasing */
         return iStore;
-
         for(int i = 0; i < fPhyImportanceVolumes.size(); i++) {
             G4cout << "Adding importance volume " << i << G4endl;
             iStore->AddImportanceGeometryCell(std::pow(2, i), *fPhyImportanceVolumes[i]);
         }
-
         return iStore;
     }
 

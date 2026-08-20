@@ -18,6 +18,8 @@ namespace lircst {
 
         void ExecuteSimulations(G4int nRuns, G4int nEventsPerRun);
 
+        void SetGantryAngleByIndex(G4int index, G4bool updateGeom=true);
+
         void ExecuteFullRotation(G4int nEventsPerTheta);
 
         void ResetRun();

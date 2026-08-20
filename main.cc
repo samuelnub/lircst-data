@@ -14,6 +14,7 @@
 #include "DetectorConstruction.hh"
 #include "ActionInitialisation.hh"
 #include "ParallelWorldConstruction.hh"
+#include "WorkerInitialization.hh"
 
 #include <chrono>
 
@@ -44,6 +45,7 @@ int main(int argc,char** argv) {
 
         // Our run manager - manages flow of program, and event loop(s) in a run
         auto runManager = new RunManager(std::chrono::system_clock::now().time_since_epoch().count());
+        //runManager->SetUserInitialization(new WorkerInitialization); // For worker thread setup before each run 
 
         // Set must-have user init classes
         auto detector = new DetectorConstruction();
@@ -95,7 +97,7 @@ int main(int argc,char** argv) {
 
             auto timestampStart = (unsigned long)time(NULL);
 
-            int noOfEvents = 1*pow(10, 7);
+            int noOfEvents = 1*pow(10, 4);
             // Our version of beamOn
             runManager->ExecuteFullRotation(noOfEvents);
 

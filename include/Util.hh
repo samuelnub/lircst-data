@@ -38,6 +38,7 @@ namespace lircst {
         static const G4int GetNumPixelsX() { return fNumPixelsX; } 
         static const G4int GetNumPixelsY() { return fNumPixelsY; }
         static const G4int GetNumBins() { return fNumBins; }
+        static const G4double GetGunAngleOffset() { return fGunAngleOffset; }
         static const G4double GetGunEnergy() { return fGunEnergy; }
         static const G4double GetEnergyMin() { return fEnergyMin; }
         static const G4double GetEnergyMax() { return fEnergyMax; }
@@ -55,6 +56,7 @@ namespace lircst {
         static const G4int fNumPixelsX = 128;
         static const G4int fNumPixelsY = 128;
         static const G4int fNumBins = 100;
+        static constexpr G4double fGunAngleOffset = 0.0 * CLHEP::pi; // 0.5 pi is equivalent to CT mode 
         static constexpr G4double fGunEnergy = 1.0 * MeV; // Mimics peak of a 6MeV radiotherapy photon spectrum
         static constexpr G4double fEnergyMin = 0.324 * MeV;
         static constexpr G4double fEnergyMax = 0.353 * MeV; // According to angle alpha based on how far the source is from the isocentre and the width of the phantom
@@ -65,7 +67,7 @@ namespace lircst {
         static constexpr G4double fSourceDistIsocenter = 100.0 * cm;
         static constexpr G4double fWorldGunSDRatio = 0.9; // TODO: deprecated
         static constexpr G4double fCollSDToIncidentRatio = 0.65; // TODO: deprecated
-        static constexpr G4double fCollCosAcceptanceDeg = 2.29;
+        static constexpr G4double fCollCosAcceptanceDeg = 4; // 2.29;
         static const G4bool fEnableSolidAngleBiasing = false;
     };
 }
