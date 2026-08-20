@@ -28,33 +28,36 @@ namespace lircst {
     }
 
     G4bool EnergySpectScorer::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
-        // Get energy in this step        
-        G4double energy = aStep->GetPreStepPoint()->GetKineticEnergy();
+        const auto* pre = aStep->GetPreStepPoint();
 
-        // G4cout << "EnergySpectScorer processing hit with energy: " << energy << G4endl;
+        const G4double energy =
+            pre->GetKineticEnergy();
+        if (energy == 0.)
+            return false;
 
-        if (energy == 0) return false;
+        auto touchable = pre->GetTouchableHandle();
 
-        // Collimation
+        const auto* transform = touchable->GetHistory()->GetPtrTopTransform();
+
+        G4ThreeVector momentumWorld = aStep->GetPreStepPoint()->GetMomentumDirection();
+
+        G4ThreeVector momentumLocal = transform->TransformAxis(momentumWorld);
+
+        // Assuming +Y is the detector normal in detector-local coordinates.
+        G4ThreeVector detectorNormalLocal(0., 1., 0.);
+
+        G4double alignment =
+            detectorNormalLocal.dot(momentumLocal);
+
+        //G4cout << "EnergySpectScorer: alignment (cosine): " << alignment << ", fCollTolerance: " << fCollTolerance  << ", momentumLocal: (" << momentumLocal.x() << ", " << momentumLocal.y() << ", " << momentumLocal.z() << ")" << G4endl;
 
         switch(fScorerType) {
             case ScorerType::Parallel: {
-                auto runManager = static_cast<RunManager*>(G4MTRunManager::GetMasterRunManager());
-                G4double gantryAngle = runManager->GetCurrentGantryAngleRad();
-                auto virtualDetectorNormal = G4ThreeVector(0, 1, 0).rotateZ(-gantryAngle);
-                G4ThreeVector momentumDirection = aStep->GetPreStepPoint()->GetMomentumDirection();
-                G4double alignment = virtualDetectorNormal.dot(momentumDirection);
-
-                //G4cout << "Virtual detector normal: " << virtualDetectorNormal << " Momentum direction: " << momentumDirection << " Alignment: " << alignment << G4endl;
-
                 if (alignment < fCollTolerance) return false;
                 break;
             }
             case ScorerType::Pinhole: {
-                G4ThreeVector momentumDirection = aStep->GetPreStepPoint()->GetMomentumDirection();
-                G4ThreeVector expectedDirection = (fCollPosition - aStep->GetPreStepPoint()->GetPosition()).unit();
-                G4double alignment = std::abs(expectedDirection.dot(momentumDirection));
-                if (alignment < fCollTolerance) return false;
+                G4cout << "EnergySpectScorer: Pinhole collimation not implemented yet!" << G4endl;
                 break;
             }
             default: {
@@ -64,7 +67,6 @@ namespace lircst {
 
         // Get pos of the step, and what pixel that corresponds to
         // Get local pos - local to touchable!
-        auto touchable = aStep->GetPreStepPoint()->GetTouchable();
         G4ThreeVector worldPos = aStep->GetPreStepPoint()->GetPosition();
         G4ThreeVector pos = touchable->GetHistory()->GetTopTransform().TransformPoint(worldPos);
 

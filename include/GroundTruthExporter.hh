@@ -28,6 +28,8 @@ namespace lircst {
 
         G4Navigator* fNavigator = new G4Navigator();
 
+        std::vector<double> fElecDensAndLinAttenData;
+
         G4int fResolution = 128;
         G4String fFilenameSuffix = ".npy";
     };

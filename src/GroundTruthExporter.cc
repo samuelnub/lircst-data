@@ -25,7 +25,7 @@ namespace lircst {
         G4double pixelWidth = 2 * imagingPlaneWidth / fResolution;
         G4double halfPixelWidth = pixelWidth / 2;
 
-        std::vector<double> elecDensAndLinAttenData(2 * fResolution * fResolution, 0.0f); // 2 channels: 0 = electron density, 1 = linear attenuation
+        fElecDensAndLinAttenData.assign(2 * fResolution * fResolution, 0.0f); // 2 channels: 0 = electron density, 1 = linear attenuation
 
         G4EmCalculator emCalc;
 
@@ -37,12 +37,12 @@ namespace lircst {
                 // Slice dimension goes along Z axis, so we want to image across X and Y
                 G4ThreeVector pos = G4ThreeVector(-imagingPlaneWidth + halfPixelWidth + i * pixelWidth, -imagingPlaneWidth + halfPixelWidth + j * pixelWidth, sliceZ);
                 G4Material* material = FindMaterialAt(pos);
-                elecDensAndLinAttenData[0 * fResolution * fResolution + i * fResolution + j] = CalculateElectronDensityPerMole(material);
-                elecDensAndLinAttenData[1 * fResolution * fResolution + i * fResolution + j] = CalculateLinearAttenuation(material, Util::GetGunEnergy(), emCalc); // Assumes usage of the monochromatic source
+                fElecDensAndLinAttenData[0 * fResolution * fResolution + i * fResolution + j] = CalculateElectronDensityPerMole(material);
+                fElecDensAndLinAttenData[1 * fResolution * fResolution + i * fResolution + j] = CalculateLinearAttenuation(material, Util::GetGunEnergy(), emCalc); // Assumes usage of the monochromatic source
             }
         }
 
-        return elecDensAndLinAttenData;
+        return fElecDensAndLinAttenData;
     }
 
     void GroundTruthExporter::ExportFullVolume() {

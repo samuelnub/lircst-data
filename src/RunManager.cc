@@ -55,8 +55,7 @@ namespace lircst {
 
     void RunManager::ExecuteFullRotation(G4int nEventsPerTheta) {
         // Export ground truth phantom volume before starting the runs
-        // TODO: bugged? GroundTruthExporter().ExportFullVolume();
-
+        GroundTruthExporter().ExportFullVolume();
 
         while (!IsFullRotationComplete()) {
             G4cout << "Starting rotational run at gantry angle " << GetCurrentGantryAngleRad() << " (index " << GetCurrentGantryIndex() << ") radians with random seed " << GetRandomSeed() << G4endl;
