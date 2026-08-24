@@ -13,6 +13,10 @@
 #include "G4BiasingProcessInterface.hh"
 #include "G4ProcessManager.hh"
 
+#include "G4UserSpecialCuts.hh"
+#include "G4PhysicsListHelper.hh"
+#include "G4StepLimiter.hh"
+
 #include "Util.hh"
 
 namespace lircst {
@@ -34,10 +38,13 @@ namespace lircst {
         physicsHelper->RegisterProcess(new G4GammaConversion, particle);
         physicsHelper->RegisterProcess(new G4RayleighScattering, particle);
 
+        physicsHelper->RegisterProcess(new G4StepLimiter, particle);
+        physicsHelper->RegisterProcess(new G4UserSpecialCuts, particle);
+
         // For biasing
         if(Util::GetEnableSolidAngleBiasing()) {
             G4BiasingHelper::ActivateNonPhysicsBiasing(particle->GetProcessManager()); // TODO: for biasing
             G4BiasingHelper::AddLimiterProcess(particle->GetProcessManager()); // TODO: for biasing
-        }
+        } 
     }
 }

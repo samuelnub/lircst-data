@@ -12,6 +12,8 @@
 #include "G4GeometryManager.hh"
 #include "G4RunManager.hh"
 #include "G4MTRunManager.hh"
+#include "G4SubtractionSolid.hh"
+#include "G4UserLimits.hh"
 
 #include "G4PSDoseDeposit.hh" // TODO: temp test to see if our ESS is what's broken
 
@@ -75,6 +77,25 @@ namespace lircst {
         auto scoringVolumeSolid = new G4Box("ScoringVolume", scoringVolumeSize, scoringVolumeSize / 8, scoringVolumeSize); // TODO: magic number
         fLogicalScoringVolume = new G4LogicalVolume(scoringVolumeSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_Pb"), "ScoringVolume");
         fPhysicalScoringVolume = new G4PVPlacement(scoringVolumeRotation, G4ThreeVector(0, scoringVolumeDistFromCentre, 0), fLogicalScoringVolume, "ScoringVolume", gantryLogical, false, 0);
+        
+        // We want a region where particles that enter it get killed, to save processing time
+        auto scoringVolumeCullingSolidA = new G4Box("ScoringVolumeCRegionA", scoringVolumeSize * 1.4, scoringVolumeSize * 1.4, scoringVolumeSize * 1.4); // TODO: magic number
+        auto scoringVolumeCullingSolidB = new G4Box("ScoringVolumeCRegionB", scoringVolumeSize * 1.2, scoringVolumeSize * 1.2, scoringVolumeSize * 1.2); // TODO: magic number
+        // Translate culling solid A a tiny bit, but have culling solid B still be inside it centred around the world origin
+        auto scoringVolumeCullingSolid = new G4SubtractionSolid("ScoringVolumeCullingSolid", scoringVolumeCullingSolidA, scoringVolumeCullingSolidB, 0, G4ThreeVector(scoringVolumeSize * 0.2, scoringVolumeSize * 0.2, 0));
+        auto scoringVolumeCullingLogical = new G4LogicalVolume(scoringVolumeCullingSolid, G4NistManager::Instance()->FindOrBuildMaterial(fVoidMaterialName), "ScoringVolumeCullingLogical");
+        auto scoringVolumeCullingRegion = new G4Region("ScoringVolumeCullingRegion");
+        scoringVolumeCullingRegion->AddRootLogicalVolume(scoringVolumeCullingLogical);
+        // Kill any particles which enter the culling region, to save processing time
+        scoringVolumeCullingLogical->SetRegion(scoringVolumeCullingRegion);
+        auto userLimits = new G4UserLimits();
+        userLimits->SetMaxAllowedStep(scoringVolumeSize * 0.01); // TODO: magic number, but should be small enough to kill particles quickly
+        userLimits->SetUserMinEkine(0.00001 * keV); // TODO: magic number
+        scoringVolumeCullingRegion->SetUserLimits(userLimits);
+        // Attach the culling region to the gantry logical volume, so that it rotates too
+        auto scoringVolumeCullingPhysical = new G4PVPlacement(0, G4ThreeVector(0,0,0), scoringVolumeCullingLogical, "ScoringVolumeCullingPhysical", gantryLogical, false, 0);
+        
+
         // For importance biasing
         //fPhyImportanceVolumes.push_back(scoringVolumePhysical);
 
