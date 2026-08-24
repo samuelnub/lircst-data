@@ -36,11 +36,9 @@ namespace lircst {
             return false;
 
         auto touchable = pre->GetTouchableHandle();
-
         const auto* transform = touchable->GetHistory()->GetPtrTopTransform();
 
         G4ThreeVector momentumWorld = aStep->GetPreStepPoint()->GetMomentumDirection();
-
         G4ThreeVector momentumLocal = transform->TransformAxis(momentumWorld);
 
         // Assuming +Y is the detector normal in detector-local coordinates.
@@ -77,7 +75,7 @@ namespace lircst {
         // Determine enregy bin
         G4int bin = static_cast<G4int>((energy-fEMin) / (fEMax-fEMin) * fNbins);
         if (bin < 0 || bin >= fNbins) {
-            G4cout << "EnergySpectScorer: (SUSPICIOUS) Energy " << energy << " out of bounds for binning, bin index: " << bin << ", pos x and z: (" << pos.x() << ", " << pos.z() << ")" << G4endl;
+            // G4cout << "EnergySpectScorer: (SUSPICIOUS) Energy " << energy << " out of bounds for binning, bin index: " << bin << ", pos x and z: (" << pos.x() << ", " << pos.z() << ")" << G4endl;
             return false;
         } // Out of bounds
 

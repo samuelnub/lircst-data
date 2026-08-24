@@ -3,6 +3,7 @@
 #include "PrimaryGeneratorAction.hh"
 #include "EventAction.hh"
 #include "RunAction.hh"
+#include "StackingAction.hh"
 //#include "SteppingAction.hh"
 
 namespace lircst {
@@ -14,6 +15,7 @@ namespace lircst {
         SetUserAction(new RunAction);
         SetUserAction(new EventAction);
         SetUserAction(new PrimaryGeneratorAction);
+        SetUserAction(new StackingAction);
         //SetUserAction(new SteppingAction);
     }
 }

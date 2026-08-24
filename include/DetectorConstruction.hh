@@ -37,6 +37,8 @@ namespace lircst {
         G4VPhysicalVolume* fPhysicalGantryVolume = nullptr;
         G4VPhysicalVolume* fPhysicalScoringVolume = nullptr;
         G4VPhysicalVolume* fPhysicalWorldVolume = nullptr;
+        G4RotationMatrix* fGantryRotation = nullptr;
+        G4String fVoidMaterialName = "G4_Galactic";
         std::vector<G4VPhysicalVolume*> fPhyImportanceVolumes; // TODO: unused
     };
 }

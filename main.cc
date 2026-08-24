@@ -97,7 +97,7 @@ int main(int argc,char** argv) {
 
             auto timestampStart = (unsigned long)time(NULL);
 
-            int noOfEvents = 1*pow(10, 5);
+            int noOfEvents = 1*pow(10, 6);
             // Our version of beamOn
             runManager->ExecuteFullRotation(noOfEvents);
 

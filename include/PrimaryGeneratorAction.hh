@@ -16,6 +16,11 @@ namespace lircst {
         Poly = 1,
     };
 
+    enum BeamShape {
+        Cone = 0,
+        Pyramid = 1, // Should be more efficient as it's squared off
+    };
+
     class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
     public:
         PrimaryGeneratorAction();
@@ -25,6 +30,7 @@ namespace lircst {
 
     private:
         SpectrumType fSpectrumType = SpectrumType::Mono;
+        BeamShape fBeamShape = BeamShape::Pyramid;
 
         // beta_distribution<> fBetaDist = beta_distribution<>(2.0, 4.0); // According to Analytical parameters
         // G4float fBetaMaxEnergy = 0.120 * MeV; // According to Analytical parameters

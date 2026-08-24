@@ -18,12 +18,12 @@ namespace lircst {
 
         // Generate random material for root phantom volume, but check if its electron density is < a threshold
         G4double phantomMaterialMaxRhoE = 1;
-        auto phantomMaterial = GetRandomMaterial();
-        while (GroundTruthExporter::CalculateElectronDensityPerMole(phantomMaterial) > phantomMaterialMaxRhoE) {
-            phantomMaterial = GetRandomMaterial();
-        }
+        auto phantomMaterial = G4NistManager::Instance()->FindOrBuildMaterial("G4_AIR"); // GetRandomMaterial();
+        //while (GroundTruthExporter::CalculateElectronDensityPerMole(phantomMaterial) > phantomMaterialMaxRhoE) {
+        //    phantomMaterial = GetRandomMaterial();
+        //}
 
-        auto phantomSolid = new G4Box("Phantom", phantomSize, phantomSize, phantomSize);
+        auto phantomSolid = new G4Tubs("Phantom", 0, phantomSize, phantomSize, 0, 360 * deg);
         auto phantomLogical = new G4LogicalVolume(phantomSolid, phantomMaterial, "Phantom");
         auto phantomPhysical = new G4PVPlacement(0, G4ThreeVector(), phantomLogical, "Phantom", fLogicalWorldVol, false, 0, true);
 

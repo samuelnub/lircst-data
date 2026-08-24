@@ -48,26 +48,42 @@ namespace lircst {
         );
 
         G4ThreeVector axis = -pos.unit(); // Point towards the centre of the world
+        G4double alpha;
+        G4ThreeVector dir_local;
+        G4ThreeVector dir;
 
-        // We want a cone beam with the same angular spread as the one subtended by the phantom at the source, so we randomise the momentum direction within that cone
-        G4double alpha = std::atan(Util::GetPhantomSize() / Util::GetSourceDistIsocenter());
+        switch (fBeamShape) {
+            case BeamShape::Cone: {
+                    // We want a cone beam with the same angular spread as the one subtended by the phantom at the source, so we randomise the momentum direction within that cone
+                    // Sample by Solid angle, not Angle!
+                    alpha = std::atan(Util::GetPhantomSize() / Util::GetSourceDistIsocenter());
+                    G4double xi = G4UniformRand();
+                    G4double cosTheta = 1.0 - xi * (1.0 - std::cos(alpha));
+                    G4double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
+                    G4double phi = G4UniformRand() * 2.0 * CLHEP::pi;
 
-        // Sample by Solid angle, not Angle!
-        G4double xi = G4UniformRand();
-        G4double cosTheta = 1.0 - xi * (1.0 - std::cos(alpha));
-        G4double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
-        G4double phi = G4UniformRand() * 2.0 * CLHEP::pi;
+                    dir_local = G4ThreeVector(
+                        sinTheta * std::cos(phi),
+                        sinTheta * std::sin(phi),
+                        cosTheta
+                    );
+                }
+                break;
+            case BeamShape::Pyramid: {
+                    alpha = std::atan(Util::GetPhantomSize() / Util::GetSourceDistIsocenter());
+                    G4double x = Util::GenRandomDouble(-std::tan(alpha), std::tan(alpha));
+                    G4double y = Util::GenRandomDouble(-std::tan(alpha), std::tan(alpha));
+                    dir_local = G4ThreeVector(x, y, 1.0).unit();
+                }
+                break;
+            default:
+                G4Exception("PrimaryGeneratorAction::GeneratePrimaries", "BEAMSHAPE001", FatalException, "Unknown beam shape");
+                break;
+        }
 
-        G4ThreeVector dir_local(
-            sinTheta * std::cos(phi),
-            sinTheta * std::sin(phi),
-            cosTheta
-        );
-
-        G4ThreeVector dir = dir_local.rotateUz(axis);
+        dir = dir_local.rotateUz(axis);
         this->fParticleGun->SetParticlePosition(pos);
         this->fParticleGun->SetParticleMomentumDirection(dir);
-
         this->fParticleGun->GeneratePrimaryVertex(anEvent);
     }
 }

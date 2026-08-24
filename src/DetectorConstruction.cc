@@ -34,7 +34,7 @@ namespace lircst {
         // World
         auto worldSize = Util::GetWorldSize();
         auto worldSolid = new G4Box("World", worldSize, worldSize, worldSize);
-        auto worldLogical = new G4LogicalVolume(worldSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_AIR"), "World");
+        auto worldLogical = new G4LogicalVolume(worldSolid, G4NistManager::Instance()->FindOrBuildMaterial(fVoidMaterialName), "World");
         auto worldPhysical = new G4PVPlacement(0, G4ThreeVector(), worldLogical, "World", 0, false, 0);
         // For importance biasing
         //fPhyImportanceVolumes.push_back(worldPhysical);
@@ -69,7 +69,7 @@ namespace lircst {
             0 * rad,
             2 * CLHEP::pi * rad // TODO: magic number
         );
-        auto gantryLogical = new G4LogicalVolume(gantrySolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_AIR"), "Gantry");
+        auto gantryLogical = new G4LogicalVolume(gantrySolid, G4NistManager::Instance()->FindOrBuildMaterial(fVoidMaterialName), "Gantry");
         fPhysicalGantryVolume = new G4PVPlacement(0, G4ThreeVector(0, 0, 0), gantryLogical, "Gantry", worldLogical, false, 0);
 
         auto scoringVolumeSolid = new G4Box("ScoringVolume", scoringVolumeSize, scoringVolumeSize / 8, scoringVolumeSize); // TODO: magic number
@@ -91,9 +91,12 @@ namespace lircst {
                 G4GeometryManager::GetInstance()->OpenGeometry(fPhysicalGantryVolume);
             }
 
-            auto rotation = new G4RotationMatrix();
-            rotation->rotateZ(-angle); // Minus angle because it didn't seem to align with the particle generator
-            fPhysicalGantryVolume->SetRotation(rotation);
+            if (!fGantryRotation) {
+                fGantryRotation = new G4RotationMatrix();
+            }
+            fGantryRotation->set(0, 0, 0); // Reset rotation to identity
+            fGantryRotation->rotateZ(-angle); // Minus angle because it didn't seem to align with the particle generator
+            fPhysicalGantryVolume->SetRotation(fGantryRotation);
             // Needs a geometry reinitialisation after this!
 
             if (updateGeom) {
@@ -121,7 +124,6 @@ namespace lircst {
             G4cout << "MFD already constructed, skipping..." << G4endl;
             return;
         }*/
-        G4cout << "Constructing SD and field..." << G4endl;
 
         // Setup MFD and Primitive Scorer(s)
         auto mfd = new G4MultiFunctionalDetector("mfd");
@@ -186,13 +188,13 @@ namespace lircst {
     G4VPhysicalVolume* DetectorConstruction::ConstructPhanLungTumour() {
         // Base phantom
         auto phantomSize = Util::GetPhantomSize();
-        auto phantomSolid = new G4Box("Phantom", phantomSize, phantomSize, phantomSize);
+        auto phantomSolid = new G4Tubs("Phantom", 0, phantomSize, phantomSize, 0, 360 * deg);
         auto phantomLogical = new G4LogicalVolume(phantomSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_WATER"), "Phantom");
         auto phantomPhysical = new G4PVPlacement(0, G4ThreeVector(), phantomLogical, "Phantom", fLogicalWorldVolume, false, 0, true);
 
         // Lung
         auto lungSize = phantomSize * 0.8;
-        auto lungSolid = new G4Box("Lung", lungSize, lungSize, lungSize * 0.7);
+        auto lungSolid = new G4Tubs("Lung", 0, lungSize, lungSize, 0, 360 * deg);
         auto lungLogical = new G4LogicalVolume(lungSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_LUNG_ICRP"), "Lung");
         new G4PVPlacement(0, G4ThreeVector(0, 0, 0), lungLogical, "Lung", phantomLogical, false, 0, true);
 
@@ -210,7 +212,7 @@ namespace lircst {
 
         // Base phantom
         auto phantomSize = Util::GetPhantomSize();
-        auto phantomSolid = new G4Box("Phantom", phantomSize, phantomSize, phantomSize);
+        auto phantomSolid = new G4Tubs("Phantom", 0, phantomSize, phantomSize, 0, 360 * deg);
         auto phantomLogical = new G4LogicalVolume(phantomSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_WATER"), "Phantom");
         auto phantomPhysical = new G4PVPlacement(0, G4ThreeVector(), phantomLogical, "Phantom", fLogicalWorldVolume, false, 0, true);
 
