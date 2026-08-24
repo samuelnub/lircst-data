@@ -23,6 +23,7 @@ namespace lircst {
 
         G4VPhysicalVolume* GetWorldVolume() const { return fPhysicalWorldVolume; }
         G4LogicalVolume* GetScoringVolume() const { return fLogicalScoringVolume; }
+        G4VPhysicalVolume* GetCullingVolume() const { return fPhysicalCullingVolume; }
 
         void ConstructImportanceVolumes();
         G4VIStore* CreateImportanceStore(); // Caller is responsible for deletion
@@ -38,6 +39,7 @@ namespace lircst {
         G4VPhysicalVolume* fPhysicalScoringVolume = nullptr;
         G4VPhysicalVolume* fPhysicalWorldVolume = nullptr;
         G4RotationMatrix* fGantryRotation = nullptr;
+        G4VPhysicalVolume* fPhysicalCullingVolume = nullptr;
         G4String fVoidMaterialName = "G4_Galactic";
         std::vector<G4VPhysicalVolume*> fPhyImportanceVolumes; // TODO: unused
     };

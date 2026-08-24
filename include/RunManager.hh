@@ -20,7 +20,7 @@ namespace lircst {
 
         void SetGantryAngleByIndex(G4int index, G4bool updateGeom=true);
 
-        void ExecuteFullRotation(G4int nEventsPerTheta);
+        void ExecuteFullRotation(G4int nEventsPerTheta, G4int startGantryIndex=0);
 
         void ResetRun();
 

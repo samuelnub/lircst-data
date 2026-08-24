@@ -4,7 +4,7 @@
 #include "EventAction.hh"
 #include "RunAction.hh"
 #include "StackingAction.hh"
-//#include "SteppingAction.hh"
+#include "SteppingAction.hh"
 
 namespace lircst {
     void ActionInitialisation::BuildForMaster() const {
@@ -16,6 +16,6 @@ namespace lircst {
         SetUserAction(new EventAction);
         SetUserAction(new PrimaryGeneratorAction);
         SetUserAction(new StackingAction);
-        //SetUserAction(new SteppingAction);
+        SetUserAction(new SteppingAction);
     }
 }

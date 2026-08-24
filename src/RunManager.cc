@@ -6,6 +6,7 @@
 #include "G4VisManager.hh"
 #include "DetectorConstruction.hh"
 #include "GroundTruthExporter.hh"
+#include "G4Timer.hh"
 
 #include "G4TransportationManager.hh"
 
@@ -22,10 +23,14 @@ namespace lircst {
     }
 
     void RunManager::BeamOn(G4int nEvents) {
+        // Profile timing
+        G4Timer timer;
+        timer.Start();
+
         G4MTRunManager::BeamOn(nEvents);
 
-        // Old
-        // ExecuteSimulations(1, nEvents);
+        timer.Stop();
+        G4cout << "BeamOn completed in " << timer.GetRealElapsed() << " seconds" << G4endl;
     }
 
     void RunManager::ExecuteSimulations(G4int nRuns, G4int nEventsPerRun) {
@@ -53,15 +58,21 @@ namespace lircst {
         }
     }
 
-    void RunManager::ExecuteFullRotation(G4int nEventsPerTheta) {
+    void RunManager::ExecuteFullRotation(G4int nEventsPerTheta, G4int startGantryIndex) {
         // Export ground truth phantom volume before starting the runs
         GroundTruthExporter().ExportFullVolume();
+
+        // Set gantry angle to start index
+        if (fCurrentGantryIndex != startGantryIndex) {
+            G4cout << "Setting gantry angle to start index " << startGantryIndex << " (current index: " << fCurrentGantryIndex << ")" << G4endl;
+            SetGantryAngleByIndex(startGantryIndex, true);
+        }
 
         while (!IsFullRotationComplete()) {
             G4cout << "Starting rotational run at gantry angle " << GetCurrentGantryAngleRad() << " (index " << GetCurrentGantryIndex() << ") radians with random seed " << GetRandomSeed() << G4endl;
             
             // Call base class BeamOn
-            G4MTRunManager::BeamOn(nEventsPerTheta);
+            this->BeamOn(nEventsPerTheta);
 
             // Set up for next run
             SetGantryAngleByIndex(GetCurrentGantryIndex() + 1, true);
