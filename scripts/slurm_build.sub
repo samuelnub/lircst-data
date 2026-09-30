@@ -15,7 +15,7 @@
 
 set -euo pipefail
 
-PROJECT_ROOT="/mnt/fast/nobackup/users/sy00917/dev/lircst-diffusion"
+PROJECT_ROOT="/mnt/fast/nobackup/users/sy00917/dev/lircst-data"
 BUILD_DIR="${PROJECT_ROOT}/build"
 
 cd "${BUILD_DIR}" || exit 1

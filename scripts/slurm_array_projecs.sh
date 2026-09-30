@@ -9,7 +9,7 @@ fi
 SEED="$1"
 EVENTS="${2:-10000}"  # Default to 10k events if not provided
 
-OUTPUT_ROOT="/mnt/fast/nobackup/users/sy00917/dev/lircst-diffusion/build/output"
+OUTPUT_ROOT="/mnt/fast/nobackup/users/sy00917/dev/lircst-data/build/output"
 OUTPUT_DIR="${OUTPUT_ROOT}/${SEED}"
 
 mkdir -p "${OUTPUT_DIR}"

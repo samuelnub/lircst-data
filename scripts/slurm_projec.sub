@@ -40,7 +40,7 @@ echo "Events:            ${EVENTS}"
 echo "Theta index:       ${THETA_INDEX}"
 echo "Generate phantom?: ${GENERATE_PHAN}"
 
-PROJECT_ROOT="/mnt/fast/nobackup/users/sy00917/dev/lircst-diffusion"
+PROJECT_ROOT="/mnt/fast/nobackup/users/sy00917/dev/lircst-data"
 
 cd "${PROJECT_ROOT}/build" || exit 1
 source /mnt/fast/nobackup/users/sy00917/miniconda3/etc/profile.d/conda.sh
