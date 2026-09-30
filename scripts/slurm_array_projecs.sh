@@ -41,6 +41,23 @@ echo "Seed: ${SEED}"
 echo "Missing ${#missing[@]} / 200 projections:"
 echo "${array_spec}"
 
+
+PHAN_FILE="${OUTPUT_DIR}/phan.npy"
+
+if [[ -f "${PHAN_FILE}" ]]; then
+    echo "Phantom already exists."
+    NEED_PHANTOM=false
+else
+    echo "Phantom does not exist; one array task will generate it."
+    NEED_PHANTOM=true
+fi
+
+
+array_spec=$(IFS=,; echo "${missing[*]}")
+
+MAX_CONCURRENT=10  # Limit to 10 concurrent jobs
+
 sbatch \
-    --array="${array_spec}" \
-    geant4_array.slurm "${SEED}" "${EVENTS}"
+    --array="${array_spec}%${MAX_CONCURRENT}" \
+    --export=ALL,SEED="${SEED}",EVENTS="${EVENTS}",GENERATE_PHANTOM="${NEED_PHANTOM}" \
+    geant4_array.slurm

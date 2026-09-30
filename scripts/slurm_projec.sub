@@ -1,13 +1,19 @@
 #!/bin/bash
 
-if [[ $# -ne 1 ]]; then
-    echo "Usage: $0 <seed>"
-    exit 1
+THETA_INDEX="${SLURM_ARRAY_TASK_ID}"
+
+GENERATE_PHAN=false
+
+if [[ "${GENERATE_PHANTOM}" == "true" ]] && \
+   [[ "${SLURM_ARRAY_TASK_ID}" -eq "${SLURM_ARRAY_TASK_MIN}" ]]; then
+
+    GENERATE_PHAN=true
 fi
 
-SEED="$1"
-EVENTS="$2"
-
+echo "Seed:              ${SEED}"
+echo "Events:            ${EVENTS}"
+echo "Theta index:       ${THETA_INDEX}"
+echo "Generate phantom?: ${GENERATE_PHAN}"
 
 #SBATCH --partition=3090,2080ti                    #Selecting partition based on GPU type
 # weka for some reason isn't helping either #SBATCH --constraint=fs_weka
@@ -38,4 +44,6 @@ PROJECT_ROOT="/mnt/fast/nobackup/users/sy00917/dev/lircst-diffusion"
 cd "${PROJECT_ROOT}/build" || exit 1
 source /mnt/fast/nobackup/users/sy00917/miniconda3/etc/profile.d/conda.sh
 conda activate lircst-data
+
+./lircst-data "${SEED}" "${THETA_INDEX}" "${EVENTS}" "${GENERATE_PHAN}"
 
