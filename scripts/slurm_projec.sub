@@ -47,5 +47,10 @@ conda activate lircst-data
 # Strict mode only after we activate conda (as there's some unsafe stuff happening there)
 set -euo pipefail
 
+export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH:-}"
+
+echo "CONDA_PREFIX=${CONDA_PREFIX}"
+echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
+
 ./lircstData "${SEED}" "${THETA_INDEX}" "${EVENTS}" "${GENERATE_PHAN}"
 
