@@ -10,6 +10,7 @@ EVENTS="${2:-10000}"  # Default to 10k events if not provided
 OUTPUT_ROOT="/mnt/fast/nobackup/users/sy00917/dev/lircst-data/build/output"
 OUTPUT_DIR="${OUTPUT_ROOT}/${SEED}"
 
+# Our code will do it itself, but we'll keep it here for the checking of missing projections
 mkdir -p "${OUTPUT_DIR}"
 
 missing=()
@@ -59,4 +60,4 @@ MAX_CONCURRENT=10  # Limit to 10 concurrent jobs
 sbatch \
     --array="${array_spec}%${MAX_CONCURRENT}" \
     --export=ALL,SEED="${SEED}",EVENTS="${EVENTS}",GENERATE_PHANTOM="${NEED_PHANTOM}" \
-    geant4_array.slurm
+    slurm_projec.sub

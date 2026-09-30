@@ -2,10 +2,10 @@
 
 #SBATCH --partition=3090,2080ti                    #Selecting partition based on GPU type
 # weka for some reason isn't helping either #SBATCH --constraint=fs_weka
-#SBATCH --job-name="lircst-data"                 #Name of Jobs (displayed in squeue)
+#SBATCH --job-name="lircst-data-build"                 #Name of Jobs (displayed in squeue)
 #SBATCH --nodes=1                           #No of nodes to run job
 #SBATCH --cpus-per-task=4                   #No of cores to use per node (default - 4 CPU cores per GPU selected)
-#SBATCH --time=71:59:00                     #Maximum time for job to run
+#SBATCH --time=00:30:00                     #Maximum time for job to run
 #SBATCH --mem=16G                           #Amount of memory per node
 #SBATCH --gpus=0                            #Selecting n x GPUs
 #SBATCH --output=/mnt/fast/nobackup/users/sy00917/dev/lircst-data/logs/slurm.%j.%N.out            #Output file for stdout (optional)
