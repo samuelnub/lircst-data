@@ -1,10 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-if [[ $# -ne 1 ]]; then
-    echo "Usage: $0 <seed>"
-    exit 1
-fi
+echo "Usage: $0 <seed> <events (optional, default=10000)>"
+
 
 SEED="$1"
 EVENTS="${2:-10000}"  # Default to 10k events if not provided
@@ -38,6 +36,7 @@ fi
 array_spec=$(IFS=,; echo "${missing[*]}")
 
 echo "Seed: ${SEED}"
+echo "Events: ${EVENTS}"
 echo "Missing ${#missing[@]} / 200 projections:"
 echo "${array_spec}"
 
