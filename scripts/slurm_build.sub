@@ -4,7 +4,7 @@
 # weka for some reason isn't helping either #SBATCH --constraint=fs_weka
 #SBATCH --job-name="lircst-data"                 #Name of Jobs (displayed in squeue)
 #SBATCH --nodes=1                           #No of nodes to run job
-#SBATCH --cpus-per-task=20                  #No of cores to use per node (default - 4 CPU cores per GPU selected)
+#SBATCH --cpus-per-task=4                   #No of cores to use per node (default - 4 CPU cores per GPU selected)
 #SBATCH --time=71:59:00                     #Maximum time for job to run
 #SBATCH --mem=16G                           #Amount of memory per node
 #SBATCH --gpus=0                            #Selecting n x GPUs
@@ -14,37 +14,18 @@
 # P.S those directories are relative to where you sent off your submit script
 
 set -euo pipefail
-set -x # Echo commands before executing them
-
-echo "Starting job on $(date), Info:"
-echo $SLURM_JOB_ID
-echo $SLURM_SUBMIT_DIR
-# echo $SLURM_JOB_NODELIST
-# echo $SLURM_NTASKS
-# echo $SLURM_JOB_ID
-echo $SLURM_ARRAY_TASK_ID
-
-
-THETA_INDEX="${SLURM_ARRAY_TASK_ID}"
-
-GENERATE_PHAN=false
-
-if [[ "${GENERATE_PHANTOM}" == "true" ]] && \
-   [[ "${SLURM_ARRAY_TASK_ID}" -eq "${SLURM_ARRAY_TASK_MIN}" ]]; then
-
-    GENERATE_PHAN=true
-fi
-
-echo "Seed:              ${SEED}"
-echo "Events:            ${EVENTS}"
-echo "Theta index:       ${THETA_INDEX}"
-echo "Generate phantom?: ${GENERATE_PHAN}"
 
 PROJECT_ROOT="/mnt/fast/nobackup/users/sy00917/dev/lircst-diffusion"
+BUILD_DIR="${PROJECT_ROOT}/build"
 
-cd "${PROJECT_ROOT}/build" || exit 1
+cd "${BUILD_DIR}" || exit 1
 source /mnt/fast/nobackup/users/sy00917/miniconda3/etc/profile.d/conda.sh
 conda activate lircst-data
 
-./lircst-data "${SEED}" "${THETA_INDEX}" "${EVENTS}" "${GENERATE_PHAN}"
 
+echo "Checking/building project..."
+
+cmake -DGeant4_DIR=$CONDA_PREFIX/lib/Geant4-* ../
+make -j4
+
+echo "Build complete: $(date)"
