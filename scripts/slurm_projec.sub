@@ -47,5 +47,5 @@ conda activate lircst-data
 # Strict mode only after we activate conda (as there's some unsafe stuff happening there)
 set -euo pipefail
 
-./lircst-data "${SEED}" "${THETA_INDEX}" "${EVENTS}" "${GENERATE_PHAN}"
+./lircstData "${SEED}" "${THETA_INDEX}" "${EVENTS}" "${GENERATE_PHAN}"
 
