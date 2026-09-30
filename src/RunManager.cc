@@ -22,8 +22,12 @@ namespace lircst {
         fMessenger->DeclareMethod("setGantryAngleByIndex", &RunManager::SetGantryAngleByIndex, "Set gantry angle by index");
     }
 
-    void RunManager::BeamOn(G4int nEvents) {
-        // Profile timing
+    void RunManager::BeamOn(G4int nEvents, G4bool exportGroundTruth) {
+        if (exportGroundTruth) {
+            GroundTruthExporter().ExportFullVolume();
+        }
+
+        // Profile timing for just the beamOn portion
         G4Timer timer;
         timer.Start();
 
@@ -59,8 +63,6 @@ namespace lircst {
     }
 
     void RunManager::ExecuteFullRotation(G4int nEventsPerTheta, G4int startGantryIndex) {
-        // Export ground truth phantom volume before starting the runs
-        GroundTruthExporter().ExportFullVolume();
 
         // Set gantry angle to start index
         if (fCurrentGantryIndex != startGantryIndex) {
@@ -72,7 +74,7 @@ namespace lircst {
             G4cout << "Starting rotational run at gantry angle " << GetCurrentGantryAngleRad() << " (index " << GetCurrentGantryIndex() << ") radians with random seed " << GetRandomSeed() << G4endl;
             
             // Call base class BeamOn
-            this->BeamOn(nEventsPerTheta);
+            this->BeamOn(nEventsPerTheta, GetCurrentGantryIndex() == startGantryIndex); // Export ground truth only for the first run
 
             // Set up for next run
             SetGantryAngleByIndex(GetCurrentGantryIndex() + 1, true);

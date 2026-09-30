@@ -1,0 +1,41 @@
+#!/bin/bash
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 <seed>"
+    exit 1
+fi
+
+SEED="$1"
+EVENTS="$2"
+
+
+#SBATCH --partition=3090,2080ti                    #Selecting partition based on GPU type
+# weka for some reason isn't helping either #SBATCH --constraint=fs_weka
+#SBATCH --job-name="lircst-data"                 #Name of Jobs (displayed in squeue)
+#SBATCH --nodes=1                           #No of nodes to run job
+#SBATCH --cpus-per-task=20                  #No of cores to use per node (default - 4 CPU cores per GPU selected)
+#SBATCH --time=71:59:00                     #Maximum time for job to run
+#SBATCH --mem=16G                           #Amount of memory per node
+#SBATCH --gpus=1                            #Selecting n x GPUs
+#SBATCH --output=/mnt/fast/nobackup/users/sy00917/dev/lircst-data/logs/slurm.%j.%N.out            #Output file for stdout (optional)
+#SBATCH --error=/mnt/fast/nobackup/users/sy00917/dev/lircst-data/logs/slurm.%j.%N.err             #Error file for stderr (optional)
+# P.S slurm probably won't make directories for you (logging etc.)
+# P.S those directories are relative to where you sent off your submit script
+
+set -euo pipefail
+set -x # Echo commands before executing them
+
+echo "Starting job on $(date), Info:"
+echo $SLURM_JOB_ID
+echo $SLURM_SUBMIT_DIR
+# echo $SLURM_JOB_NODELIST
+# echo $SLURM_NTASKS
+# echo $SLURM_JOB_ID
+echo $SLURM_ARRAY_TASK_ID
+
+PROJECT_ROOT="/mnt/fast/nobackup/users/sy00917/dev/lircst-diffusion"
+
+cd "${PROJECT_ROOT}/build" || exit 1
+source /mnt/fast/nobackup/users/sy00917/miniconda3/etc/profile.d/conda.sh
+conda activate lircst-data
+

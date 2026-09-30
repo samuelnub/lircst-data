@@ -40,11 +40,23 @@ int main(int argc,char** argv) {
     });
 
     try {
+        auto visMacro = "vis.mac";
+
         G4UIExecutive* ui = nullptr;
-        if ( argc > 1 ) { ui = new G4UIExecutive(argc, argv); }
+        if (argc > 1 && argv[1] == visMacro ) { ui = new G4UIExecutive(argc, argv); }
+
+        auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+        auto gantryIndex = 0;
+
+        if (argc > 1 && argv[1] != visMacro) {
+            assert(argc == 5 && "Usage: ./lircstData <seed> <gantryIndex> <noOfEvents> <isGeneratePhan>");
+            seed = atoi(argv[1]);
+
+            gantryIndex = atoi(argv[2]);
+        }
 
         // Our run manager - manages flow of program, and event loop(s) in a run
-        auto runManager = new RunManager(std::chrono::system_clock::now().time_since_epoch().count());
+        auto runManager = new RunManager(seed, gantryIndex);
         //runManager->SetUserInitialization(new WorkerInitialization); // For worker thread setup before each run 
 
         // Set must-have user init classes
@@ -82,7 +94,7 @@ int main(int argc,char** argv) {
         uiManager->ApplyCommand("/event/verbose 0");
         uiManager->ApplyCommand("/tracking/verbose 0");
 
-        if (argc > 1) {
+        if (argc > 1 && argv[1] == visMacro) {
             // Assume it's a vis ui session
             //auto ui = new G4UIExecutive(argc, argv);
             G4String command = "/control/execute ";
@@ -93,7 +105,7 @@ int main(int argc,char** argv) {
         }
 
         if (argc == 1) {
-            // Start a run if not in vis ui session
+            // Start a regular run if not in vis ui session
 
             auto timestampStart = (unsigned long)time(NULL);
 
@@ -105,6 +117,21 @@ int main(int argc,char** argv) {
 
             G4cout << "End of run(s) tee hee, took " << timestampEnd - timestampStart << " seconds" << G4endl;
         }
+
+        // Our jobbed version
+        if (argc > 1 && argv[1] != visMacro) {
+
+            assert(argc == 5 && "Usage: ./lircstData <seed> <gantryIndex> <noOfEvents> <isGeneratePhan>");
+
+            // Seed already set above...
+
+            int noOfEvents = atoi(argv[3]);
+            bool isGeneratePhan = argv[4] == std::string("true") || argv[4] == std::string("1");
+
+            // For this jobbed version, we just execute one projection at the specified gantry index
+            runManager->BeamOn(noOfEvents, isGeneratePhan);
+        }
+
 
         // Terminate job
         delete visManager;

@@ -14,7 +14,7 @@ namespace lircst {
         ~RunManager() override = default;
 
         // We treat this as an ExecuteSimulations but just 1 run
-        void BeamOn(G4int nEvents);
+        void BeamOn(G4int nEvents, G4bool exportGroundTruth = false);
 
         void ExecuteSimulations(G4int nRuns, G4int nEventsPerRun);
 
