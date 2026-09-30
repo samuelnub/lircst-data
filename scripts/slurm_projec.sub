@@ -13,8 +13,6 @@
 # P.S slurm probably won't make directories for you (logging etc.)
 # P.S those directories are relative to where you sent off your submit script
 
-set -euo pipefail
-set -x # Echo commands before executing them
 
 echo "Starting job on $(date), Info:"
 echo $SLURM_JOB_ID
@@ -45,6 +43,9 @@ PROJECT_ROOT="/mnt/fast/nobackup/users/sy00917/dev/lircst-data"
 cd "${PROJECT_ROOT}/build" || exit 1
 source /mnt/fast/nobackup/users/sy00917/miniconda3/etc/profile.d/conda.sh
 conda activate lircst-data
+
+# Strict mode only after we activate conda (as there's some unsafe stuff happening there)
+set -euo pipefail
 
 ./lircst-data "${SEED}" "${THETA_INDEX}" "${EVENTS}" "${GENERATE_PHAN}"
 

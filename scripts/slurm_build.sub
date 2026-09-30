@@ -13,7 +13,6 @@
 # P.S slurm probably won't make directories for you (logging etc.)
 # P.S those directories are relative to where you sent off your submit script
 
-set -euo pipefail
 
 PROJECT_ROOT="/mnt/fast/nobackup/users/sy00917/dev/lircst-data"
 BUILD_DIR="${PROJECT_ROOT}/build"
@@ -22,6 +21,8 @@ cd "${BUILD_DIR}" || exit 1
 source /mnt/fast/nobackup/users/sy00917/miniconda3/etc/profile.d/conda.sh
 conda activate lircst-data
 
+# Strict mode only after we activate conda (as there's some unsafe stuff happening there)
+set -euo pipefail
 
 echo "Checking/building project..."
 
