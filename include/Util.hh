@@ -59,7 +59,7 @@ namespace lircst {
         static const G4bool GetEnableSolidAngleBiasing() { return fEnableSolidAngleBiasing; }
 
     private:
-        static const GantryType fGantryType = GantryType::CST;
+        static const GantryType fGantryType = GantryType::TransmissionCT; // TODO: make this a command line argument or something
         static const G4int fNumPixelsX = 128;
         static const G4int fNumPixelsY = 128;
         static const G4int fNumBins = 100;
