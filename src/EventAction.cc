@@ -29,7 +29,7 @@ namespace lircst {
 
         if (hitsMap->size() == 0) return;
 
-        G4cout << "In EventAction::EndOfEventAction, event ID: " << event->GetEventID() << ", hits map size: " << hitsMap->size() << " from hCID " << hcID << G4endl;
+        //G4cout << "In EventAction::EndOfEventAction, event ID: " << event->GetEventID() << ", hits map size: " << hitsMap->size() << " from hCID " << hcID << G4endl;
 
 
         // So cursed

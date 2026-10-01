@@ -48,7 +48,7 @@ namespace lircst {
         auto* detectorConstruction = static_cast<DetectorConstruction*>(const_cast<G4VUserDetectorConstruction*>(G4RunManager::GetRunManager()->GetUserDetectorConstruction()));
         auto* cullingVolume = detectorConstruction->GetCullingVolume();
         if(!cullingVolume) {
-            G4cout << "Culling volume is NULL!" << G4endl;
+            // G4cout << "Culling volume is NULL!" << G4endl;
             return;
         }
         if(post->GetPhysicalVolume() == cullingVolume) {

@@ -43,12 +43,12 @@ int main(int argc,char** argv) {
         auto visMacro = "vis.mac";
 
         G4UIExecutive* ui = nullptr;
-        if (argc > 1 && argv[1] == visMacro ) { ui = new G4UIExecutive(argc, argv); }
+        if (argc > 1 && strcmp(argv[1], visMacro) == 0 ) { ui = new G4UIExecutive(argc, argv); }
 
         auto seed = std::chrono::system_clock::now().time_since_epoch().count();
         auto gantryIndex = 0;
 
-        if (argc > 1 && argv[1] != visMacro) {
+        if (argc > 1 && strcmp(argv[1], visMacro) != 0) {
             assert(argc == 5 && "Usage: ./lircstData <seed> <gantryIndex> <noOfEvents> <isGeneratePhan>");
             seed = atoi(argv[1]);
 
@@ -94,7 +94,7 @@ int main(int argc,char** argv) {
         uiManager->ApplyCommand("/event/verbose 0");
         uiManager->ApplyCommand("/tracking/verbose 0");
 
-        if (argc > 1 && argv[1] == visMacro) {
+        if (argc > 1 && strcmp(argv[1], visMacro) == 0) {
             // Assume it's a vis ui session
             //auto ui = new G4UIExecutive(argc, argv);
             G4String command = "/control/execute ";
@@ -129,7 +129,7 @@ int main(int argc,char** argv) {
             bool isGeneratePhan = argv[4] == std::string("true") || argv[4] == std::string("1");
 
             // For this jobbed version, we just execute one projection at the specified gantry index
-            runManager->BeamOn(noOfEvents, isGeneratePhan, true); // Export ground truth only once for all projections, and update geometry to the specified gantry angle
+            runManager->BeamOn(noOfEvents, isGeneratePhan); // Export ground truth only once for all projections, and update geometry to the specified gantry angle
         }
 
 

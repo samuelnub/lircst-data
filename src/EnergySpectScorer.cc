@@ -74,15 +74,21 @@ namespace lircst {
 
         // Determine enregy bin
         G4int bin = static_cast<G4int>((energy-fEMin) / (fEMax-fEMin) * fNbins);
-        if (bin < 0 || bin >= fNbins) {
-            // G4cout << "EnergySpectScorer: (SUSPICIOUS) Energy " << energy << " out of bounds for binning, bin index: " << bin << ", pos x and z: (" << pos.x() << ", " << pos.z() << ")" << G4endl;
-            return false;
-        } // Out of bounds
+        if (Util::GetGantryType() == GantryType::CST) {
+            // For CST, we want to properly bin and reject photons outside the acceptable energy range, but for CT, we'll just take whatever
+            if (bin < 0 || bin >= fNbins) {
+                // G4cout << "EnergySpectScorer: (SUSPICIOUS) Energy " << energy << " out of bounds for binning, bin index: " << bin << ", pos x and z: (" << pos.x() << ", " << pos.z() << ")" << G4endl;
+                return false;
+            } // Out of bounds
+        } else if (Util::GetGantryType() == GantryType::TransmissionCT) {
+            // For CT, we just want to count photons, so we don't care about energy binning
+            bin = 0;
+        }
 
         // Gen unique key for pixel and bin combination
         G4int key = Util::GenMapKey(i, j, bin);
 
-        G4cout << "EnergySpectScorer accepted hit with energy: " << energy << " and pixel coordinates: (" << i << ", " << j << ", " << bin << ")" << ", pos x and z: (" << pos.x() << ", " << pos.z() << ")" << G4endl;
+        G4cout << "EnergySpectScorer accepted hit with energy: " << energy << " and pixel coordinates: (" << i << ", " << j << ", " << bin << ")" << ", pos x and z: (" << pos.x() << ", " << pos.z() << ")" << " collimation alignment: " << alignment << " and key: " << key << G4endl;
 
         G4double valueToAdd = 1; // For now, we just count photons, so we add 1 for each hit. In the future, we might want to add energy deposit or other metrics.
 

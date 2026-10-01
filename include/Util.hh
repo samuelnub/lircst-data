@@ -15,6 +15,11 @@ using namespace std;
 namespace lircst {
     template class AccumulableMap<G4int>;
 
+    enum GantryType {
+        CST = 0,
+        TransmissionCT = 1
+    };
+
     class Util {
     public:
         static G4String GetInstanceRunName();
@@ -35,10 +40,11 @@ namespace lircst {
 
         static G4bool CreateDirectory(G4String path);
 
+        static const GantryType GetGantryType() { return fGantryType; }
         static const G4int GetNumPixelsX() { return fNumPixelsX; } 
         static const G4int GetNumPixelsY() { return fNumPixelsY; }
         static const G4int GetNumBins() { return fNumBins; }
-        static const G4double GetGunAngleOffset() { return fGunAngleOffset; }
+        static const G4double GetGunAngleOffset() { return (GetGantryType() == GantryType::CST) ? 0.0 : 0.5 * CLHEP::pi; }
         static const G4double GetGunEnergy() { return fGunEnergy; }
         static const G4double GetEnergyMin() { return fEnergyMin; }
         static const G4double GetEnergyMax() { return fEnergyMax; }
@@ -53,10 +59,10 @@ namespace lircst {
         static const G4bool GetEnableSolidAngleBiasing() { return fEnableSolidAngleBiasing; }
 
     private:
+        static const GantryType fGantryType = GantryType::CST;
         static const G4int fNumPixelsX = 128;
         static const G4int fNumPixelsY = 128;
         static const G4int fNumBins = 100;
-        static constexpr G4double fGunAngleOffset = 0.0 * CLHEP::pi; // 0.5 pi is equivalent to CT mode 
         static constexpr G4double fGunEnergy = 1.0 * MeV; // Mimics peak of a 6MeV radiotherapy photon spectrum
         static constexpr G4double fEnergyMin = 0.324 * MeV;
         static constexpr G4double fEnergyMax = 0.353 * MeV; // According to angle alpha based on how far the source is from the isocentre and the width of the phantom

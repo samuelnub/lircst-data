@@ -78,15 +78,16 @@ namespace lircst {
         fLogicalScoringVolume = new G4LogicalVolume(scoringVolumeSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_Pb"), "ScoringVolume");
         fPhysicalScoringVolume = new G4PVPlacement(scoringVolumeRotation, G4ThreeVector(0, scoringVolumeDistFromCentre, 0), fLogicalScoringVolume, "ScoringVolume", gantryLogical, false, 0);
         
-        // We want a region where particles that enter it get killed, to save processing time
-        auto scoringVolumeCullingSolidA = new G4Box("ScoringVolumeCRegionA", scoringVolumeSize * 1.4, scoringVolumeSize * 1.4, scoringVolumeSize * 1.4); // TODO: magic number
-        auto scoringVolumeCullingSolidB = new G4Box("ScoringVolumeCRegionB", scoringVolumeSize * 1.2, scoringVolumeSize * 1.2, scoringVolumeSize * 1.2); // TODO: magic number
-        // Translate culling solid A a tiny bit, but have culling solid B still be inside it centred around the world origin
-        auto scoringVolumeCullingSolid = new G4SubtractionSolid("CullingVolume", scoringVolumeCullingSolidA, scoringVolumeCullingSolidB, 0, G4ThreeVector(scoringVolumeSize * 0.2, scoringVolumeSize * 0.2, 0));
-        auto scoringVolumeCullingLogical = new G4LogicalVolume(scoringVolumeCullingSolid, G4NistManager::Instance()->FindOrBuildMaterial(fVoidMaterialName), "CullingVolume");
-        // Attach it to the world volume, or else it won't be able to catch particles that are outside the gantry volume. But remember to rotate with gantry!
-        fPhysicalCullingVolume = new G4PVPlacement(0, G4ThreeVector(0,0,0), scoringVolumeCullingLogical, "CullingVolume", worldLogical, false, 0);
-        
+        if (Util::GetGantryType() == GantryType::CST) {
+            // We want a region where particles that enter it get killed, to save processing time
+            auto scoringVolumeCullingSolidA = new G4Box("ScoringVolumeCRegionA", scoringVolumeSize * 1.4, scoringVolumeSize * 1.4, scoringVolumeSize * 1.4); // TODO: magic number
+            auto scoringVolumeCullingSolidB = new G4Box("ScoringVolumeCRegionB", scoringVolumeSize * 1.2, scoringVolumeSize * 1.2, scoringVolumeSize * 1.2); // TODO: magic number
+            // Translate culling solid A a tiny bit, but have culling solid B still be inside it centred around the world origin
+            auto scoringVolumeCullingSolid = new G4SubtractionSolid("CullingVolume", scoringVolumeCullingSolidA, scoringVolumeCullingSolidB, 0, G4ThreeVector(scoringVolumeSize * 0.2, scoringVolumeSize * 0.2, 0));
+            auto scoringVolumeCullingLogical = new G4LogicalVolume(scoringVolumeCullingSolid, G4NistManager::Instance()->FindOrBuildMaterial(fVoidMaterialName), "CullingVolume");
+            // Attach it to the world volume, or else it won't be able to catch particles that are outside the gantry volume. But remember to rotate with gantry!
+            fPhysicalCullingVolume = new G4PVPlacement(0, G4ThreeVector(0,0,0), scoringVolumeCullingLogical, "CullingVolume", worldLogical, false, 0);
+        }    
 
         // For importance biasing
         //fPhyImportanceVolumes.push_back(scoringVolumePhysical);
@@ -110,7 +111,10 @@ namespace lircst {
             fGantryRotation->set(0, 0, 0); // Reset rotation to identity
             fGantryRotation->rotateZ(-angle); // Minus angle because it didn't seem to align with the particle generator
             fPhysicalGantryVolume->SetRotation(fGantryRotation);
-            fPhysicalCullingVolume->SetRotation(fGantryRotation);
+            if (Util::GetGantryType() == GantryType::CST) {
+                fPhysicalCullingVolume->SetRotation(fGantryRotation);            
+            }
+            
             // Needs a geometry reinitialisation after this!
 
             if (updateGeom) {
