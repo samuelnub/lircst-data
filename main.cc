@@ -129,7 +129,7 @@ int main(int argc,char** argv) {
             bool isGeneratePhan = argv[4] == std::string("true") || argv[4] == std::string("1");
 
             // For this jobbed version, we just execute one projection at the specified gantry index
-            runManager->BeamOn(noOfEvents, isGeneratePhan);
+            runManager->BeamOn(noOfEvents, isGeneratePhan, true); // Export ground truth only once for all projections, and update geometry to the specified gantry angle
         }
 
 

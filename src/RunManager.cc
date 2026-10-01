@@ -27,6 +27,8 @@ namespace lircst {
             GroundTruthExporter().ExportFullVolume();
         }
 
+        SetGantryAngleByIndex(fCurrentGantryIndex, true); // Ensure geometry is updated to current gantry angle
+
         // Profile timing for just the beamOn portion
         G4Timer timer;
         timer.Start();
@@ -76,8 +78,8 @@ namespace lircst {
             // Call base class BeamOn
             this->BeamOn(nEventsPerTheta, GetCurrentGantryIndex() == startGantryIndex); // Export ground truth only for the first run
 
-            // Set up for next run
-            SetGantryAngleByIndex(GetCurrentGantryIndex() + 1, true);
+            // Increment gantry index for next run
+            IncrementGantryIndex();
 
             //ResetRun();
         }

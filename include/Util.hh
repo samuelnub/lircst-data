@@ -67,7 +67,7 @@ namespace lircst {
         static constexpr G4double fSourceDistIsocenter = 100.0 * cm;
         static constexpr G4double fWorldGunSDRatio = 0.9; // TODO: deprecated
         static constexpr G4double fCollSDToIncidentRatio = 0.65; // TODO: deprecated
-        static constexpr G4double fCollCosAcceptanceDeg = 4; // 2.29;
+        static constexpr G4double fCollCosAcceptanceDeg = 6; // 2.29 previously, 6 is kinda the limit before we sacrifice too much spatial resolution
         static const G4bool fEnableSolidAngleBiasing = false;
     };
 }
