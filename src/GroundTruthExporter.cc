@@ -14,31 +14,30 @@
 
 namespace lircst {
     std::vector<double>& GroundTruthExporter::Export(G4int slice) {
-        // To prevent segfaults after each run
         fNavigator->SetWorldVolume(G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetWorldVolume());
 
-        // Our imaging plane is a square encompassing the phantom
-        // We will divide this plane into a grid of fResolution x fResolution
-        // We will then calculate the electron density per pixel
-        auto imagingPlaneWidth = Util::GetPhantomSize(); // Geant4 box dimensions are half-widths, remember!
-
+        auto imagingPlaneWidth = Util::GetPhantomSize(); 
         G4double pixelWidth = 2 * imagingPlaneWidth / fResolution;
         G4double halfPixelWidth = pixelWidth / 2;
 
-        fElecDensAndLinAttenData.assign(2 * fResolution * fResolution, 0.0f); // 2 channels: 0 = electron density, 1 = linear attenuation
+        fElecDensAndLinAttenData.assign(2 * fResolution * fResolution, 0.0f); 
 
         G4EmCalculator emCalc;
+        G4double sliceZ = -imagingPlaneWidth + halfPixelWidth + slice * pixelWidth; 
 
-        G4double sliceZ = -imagingPlaneWidth + halfPixelWidth + slice * pixelWidth; // Calculate Z position of the slice we want to export
+        int sliceArea = fResolution * fResolution;
 
-        // Loop over all voxels in imaging plane
         for (int i = 0; i < fResolution; i++) {
             for (int j = 0; j < fResolution; j++) {
-                // Slice dimension goes along Z axis, so we want to image across X and Y
-                G4ThreeVector pos = G4ThreeVector(-imagingPlaneWidth + halfPixelWidth + i * pixelWidth, -imagingPlaneWidth + halfPixelWidth + j * pixelWidth, sliceZ);
+                G4ThreeVector pos = G4ThreeVector(-imagingPlaneWidth + halfPixelWidth + i * pixelWidth, 
+                                                -imagingPlaneWidth + halfPixelWidth + j * pixelWidth, 
+                                                sliceZ);
                 G4Material* material = FindMaterialAt(pos);
-                fElecDensAndLinAttenData[0 * fResolution * fResolution + i * fResolution + j] = CalculateElectronDensityPerMole(material);
-                fElecDensAndLinAttenData[1 * fResolution * fResolution + i * fResolution + j] = CalculateLinearAttenuation(material, Util::GetGunEnergy(), emCalc); // Assumes usage of the monochromatic source
+                
+                // Layout within a single slice: Keep Ch0 and Ch1 contiguous for this slice
+                // Indexing for (C, X, Y) within this slice:
+                fElecDensAndLinAttenData[0 * sliceArea + i * fResolution + j] = CalculateElectronDensityPerMole(material);
+                fElecDensAndLinAttenData[1 * sliceArea + i * fResolution + j] = CalculateLinearAttenuation(material, Util::GetGunEnergy(), emCalc);
             }
         }
 
@@ -46,15 +45,41 @@ namespace lircst {
     }
 
     void GroundTruthExporter::ExportFullVolume() {
-        // Call on our existing slice-by-slice export function, but for each slice, and concatenate results
         G4cout << "Exporting full volume..." << G4endl;
-        std::vector<double> fullVolumeData(2 * fResolution * fResolution * fResolution, 0.0f); // 2 channels: 0 = electron density, 1 = linear attenuation  
+        
+        // Total size: 2 * 128 * 128 * 128
+        std::vector<double> fullVolumeData(2 * fResolution * fResolution * fResolution, 0.0f);   
+        
+        int sliceArea = fResolution * fResolution;
+        int channelVolume = fResolution * fResolution * fResolution; // Offset for Channel 1
+
         for (int slice = 0; slice < fResolution; slice++) {
             std::vector<double>& sliceData = Export(slice);
-            std::copy(sliceData.begin(), sliceData.end(), fullVolumeData.begin() + slice * 2 * fResolution * fResolution);
+            
+            // Target Layout: C, X, Y, Z
+            // For a given slice (Z), its data elements are written to:
+            // Channel 0 destination offset: (i * fResolution * fResolution) + (j * fResolution) + slice
+            // Channel 1 destination offset: channelVolume + (i * fResolution * fResolution) + (j * fResolution) + slice
+            
+            for (int i = 0; i < fResolution; i++) {
+                for (int j = 0; j < fResolution; j++) {
+                    int sliceIdx = i * fResolution + j;
+                    
+                    // Read from sliceData
+                    double ch0_val = sliceData[0 * sliceArea + sliceIdx];
+                    double ch1_val = sliceData[1 * sliceArea + sliceIdx];
+                    
+                    // Write to fullVolumeData matching (C, X, Y, Z) stride
+                    int destIdx = i * fResolution * fResolution + j * fResolution + slice;
+                    
+                    fullVolumeData[destIdx] = ch0_val;                  // Channel 0 block
+                    fullVolumeData[channelVolume + destIdx] = ch1_val;  // Channel 1 block
+                }
+            }
         }
         WriteToFile(fullVolumeData);
     }
+
 
     G4Material* GroundTruthExporter::FindMaterialAt(G4ThreeVector pos) {
         // G4Navigator* navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();

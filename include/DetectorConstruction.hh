@@ -32,6 +32,7 @@ namespace lircst {
         G4VPhysicalVolume* ConstructPhanRandom();
         G4VPhysicalVolume* ConstructPhanLungTumour();
         G4VPhysicalVolume* ConstructPhanTubes();
+        G4VPhysicalVolume* ConstructPhanShepp();
     protected:
         G4LogicalVolume* fLogicalWorldVolume = nullptr;
         G4LogicalVolume* fLogicalScoringVolume = nullptr;

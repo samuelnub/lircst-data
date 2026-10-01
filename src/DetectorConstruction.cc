@@ -2,6 +2,8 @@
 
 #include "G4Box.hh"
 #include "G4Tubs.hh"
+#include "G4Trd.hh"
+#include "G4Ellipsoid.hh"
 #include "G4LogicalVolume.hh"
 #include "G4NistManager.hh"
 #include "G4PVPlacement.hh"
@@ -207,21 +209,33 @@ namespace lircst {
         // Base phantom
         auto phantomSize = Util::GetPhantomSize();
         auto phantomSolid = new G4Tubs("Phantom", 0, phantomSize, phantomSize, 0, 360 * deg);
-        auto phantomLogical = new G4LogicalVolume(phantomSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_WATER"), "Phantom");
+        auto phantomLogical = new G4LogicalVolume(phantomSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_LUNG_ICRP"), "Phantom");
         auto phantomPhysical = new G4PVPlacement(0, G4ThreeVector(), phantomLogical, "Phantom", fLogicalWorldVolume, false, 0, true);
 
         // Lung
-        auto lungSize = phantomSize * 0.8;
+        auto lungSize = phantomSize * 0.7;
         auto lungSolid = new G4Tubs("Lung", 0, lungSize, lungSize, 0, 360 * deg);
-        auto lungLogical = new G4LogicalVolume(lungSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_LUNG_ICRP"), "Lung");
+        auto lungLogical = new G4LogicalVolume(lungSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_AIR"), "Lung");
         new G4PVPlacement(0, G4ThreeVector(0, 0, 0), lungLogical, "Lung", phantomLogical, false, 0, true);
 
-        // Tumour
-        auto tumourSize = lungSize * 0.8;
-        auto tumourSolid = new G4Tubs("Tumour", 0, tumourSize * 0.2, tumourSize, 0, 360 * deg);
-        auto tumourLogical = new G4LogicalVolume(tumourSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_BONE_COMPACT_ICRU"), "Tumour");
-        new G4PVPlacement(new G4RotationMatrix(0, 90 * deg, 0), G4ThreeVector(lungSize * -0.3, 0, lungSize * -0.15), tumourLogical, "Tumour", lungLogical, false, 0, true);
+        // Rib
+        auto ribSize = lungSize * 0.7;
+        auto ribSolid = new G4Tubs("Rib", 0, ribSize * 0.2, ribSize, 0, 360 * deg);
+        auto ribLogical = new G4LogicalVolume(ribSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_BONE_COMPACT_ICRU"), "Rib");
+        new G4PVPlacement(new G4RotationMatrix(0, 90 * deg, 0), G4ThreeVector(lungSize * -0.3, 0, lungSize * -0.15), ribLogical, "Rib", lungLogical, false, 0, true);
     
+        // Tumour. Let's have it be an oddly shaped small trapezoid, to make it more interesting. We'll use a G4Trd for this.
+        auto tumourSize = lungSize * 0.25;
+        auto tumourSolid = new G4Trd("Tumour", tumourSize * 0.6, tumourSize * 0.2, tumourSize * 0.5, tumourSize * 0.3, tumourSize);
+        auto tumourLogical = new G4LogicalVolume(tumourSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_TISSUE_SOFT_ICRP"), "Tumour");
+        new G4PVPlacement(new G4RotationMatrix(90 * deg, 45 * deg, 30 * deg), G4ThreeVector(lungSize * 0.25, 0, lungSize * 0.2), tumourLogical, "Tumour", lungLogical, false, 0, true);
+
+        // Water droplet next to tumour, to make it more interesting. We'll use a G4Ellipsoid for this.
+        auto dropletSize = tumourSize * 0.5;
+        auto dropletSolid = new G4Ellipsoid("Droplet", dropletSize, dropletSize*0.6, dropletSize*0.8);
+        auto dropletLogical = new G4LogicalVolume(dropletSolid, G4NistManager::Instance()->FindOrBuildMaterial("G4_WATER"), "Droplet");
+        new G4PVPlacement(new G4RotationMatrix(0, 0, 0), G4ThreeVector(lungSize * 0.3, lungSize * 0.2, lungSize * 0.4), dropletLogical, "Droplet", lungLogical, false, 0, true);
+
         return phantomPhysical;
     }
 
@@ -243,6 +257,82 @@ namespace lircst {
             auto y = G4UniformRand() * phantomSize - phantomSize / 2;
             new G4PVPlacement(0, G4ThreeVector(x, y, 0), tubeLogical, "Tube", phantomLogical, false, 0, true);
         }
+
+        return phantomPhysical;
+    }
+
+    G4VPhysicalVolume* DetectorConstruction::ConstructPhanShepp() {
+        // TODO: not quite up to scratch yet, some ellipsoids are rotated the wrong way, and materials aren't fully correct
+
+        auto nist = G4NistManager::Instance();
+        
+        // Define Materials (Matching standard Shepp-Logan relative attenuation/densities scaled to H2O)
+        auto water  = nist->FindOrBuildMaterial("G4_WATER"); // Scaling baseline
+        auto bone   = nist->FindOrBuildMaterial("G4_BONE_COMPACT_ICRU");
+        auto tissue = nist->FindOrBuildMaterial("G4_TISSUE_SOFT_ICRP");
+        
+        // Scale factor to map the standard [-1, 1] normalized coordinates to your desired scan size
+        G4double scale = Util::GetPhantomSize(); // e.g., 100 * mm if GetPhantomSize() returns 100mm
+
+        // -------------------------------------------------------------------------
+        // 1. Base Phantom / Enclosing Ellipsoid (a)
+        // -------------------------------------------------------------------------
+        auto e1_solid = new G4Ellipsoid("E1_Skull_Outer", 0.69 * scale, 0.92 * scale, 0.9 * scale);
+        auto e1_log   = new G4LogicalVolume(e1_solid, bone, "E1_Skull_Outer_Log");
+        auto phantomPhysical = new G4PVPlacement(0, G4ThreeVector(0,0,0), e1_log, "Phantom", fLogicalWorldVolume, false, 0, true);
+
+        // -------------------------------------------------------------------------
+        // 2. Inner Skull / Brain Matrix (b) - Nesting overwrites the inside of E1
+        // -------------------------------------------------------------------------
+        auto e2_solid = new G4Ellipsoid("E2_Brain_Matrix", 0.6624 * scale, 0.874 * scale, 0.88 * scale);
+        auto e2_log   = new G4LogicalVolume(e2_solid, water, "E2_Brain_Matrix_Log");
+        new G4PVPlacement(0, G4ThreeVector(0, -0.0184 * scale, 0), e2_log, "E2_Brain_Matrix_Phys", e1_log, false, 0, true);
+
+        // -------------------------------------------------------------------------
+        // Inner structures (c through j) must be nested inside E2 (the Brain Matrix)
+        // -------------------------------------------------------------------------
+
+        // 3. Large Internal Structure (c)
+        auto e3_solid = new G4Ellipsoid("E3_Structure", 0.11 * scale, 0.31 * scale, 0.21 * scale);
+        auto e3_log   = new G4LogicalVolume(e3_solid, tissue, "E3_Log");
+        auto rotE3    = new G4RotationMatrix(); rotE3->rotateZ(-18 * deg);
+        new G4PVPlacement(rotE3, G4ThreeVector(0.22 * scale, 0, 0), e3_log, "E3_Phys", e2_log, false, 0, true);
+
+        // 4. Large Internal Structure (d)
+        auto e4_solid = new G4Ellipsoid("E4_Structure", 0.16 * scale, 0.41 * scale, 0.22 * scale);
+        auto e4_log   = new G4LogicalVolume(e4_solid, tissue, "E4_Log");
+        auto rotE4    = new G4RotationMatrix(); rotE4->rotateZ(18 * deg);
+        new G4PVPlacement(rotE4, G4ThreeVector(-0.22 * scale, 0, 0), e4_log, "E4_Phys", e2_log, false, 0, true);
+
+        // 5. Central Ventricle (e)
+        auto e5_solid = new G4Ellipsoid("E5_Ventricle", 0.21 * scale, 0.25 * scale, 0.35 * scale);
+        auto e5_log   = new G4LogicalVolume(e5_solid, tissue, "E5_Log");
+        new G4PVPlacement(0, G4ThreeVector(0, 0.35 * scale, 0), e5_log, "E5_Phys", e2_log, false, 0, true);
+
+        // 6. Right Ventricle / Structure (f)
+        auto e6_solid = new G4Ellipsoid("E6_Structure", 0.046 * scale, 0.046 * scale, 0.1 * scale);
+        auto e6_log   = new G4LogicalVolume(e6_solid, tissue, "E6_Log");
+        new G4PVPlacement(0, G4ThreeVector(0, 0.1 * scale, -0.25 * scale), e6_log, "E6_Phys", e2_log, false, 0, true);
+
+        // 7. Left Ventricle / Structure (g)
+        auto e7_solid = new G4Ellipsoid("E7_Structure", 0.046 * scale, 0.046 * scale, 0.1 * scale);
+        auto e7_log   = new G4LogicalVolume(e7_solid, tissue, "E7_Log");
+        new G4PVPlacement(0, G4ThreeVector(0, -0.1 * scale, -0.25 * scale), e7_log, "E7_Phys", e2_log, false, 0, true);
+
+        // 8. Bottom Internal Feature (h)
+        auto e8_solid = new G4Ellipsoid("E8_Structure", 0.046 * scale, 0.023 * scale, 0.05 * scale);
+        auto e8_log   = new G4LogicalVolume(e8_solid, tissue, "E8_Log");
+        new G4PVPlacement(0, G4ThreeVector(-0.08 * scale, -0.605 * scale, 0), e8_log, "E8_Phys", e2_log, false, 0, true);
+
+        // 9. Bottom Internal Feature (i)
+        auto e9_solid = new G4Ellipsoid("E9_Structure", 0.023 * scale, 0.023 * scale, 0.02 * scale);
+        auto e9_log   = new G4LogicalVolume(e9_solid, tissue, "E9_Log");
+        new G4PVPlacement(0, G4ThreeVector(0, -0.605 * scale, 0), e9_log, "E9_Phys", e2_log, false, 0, true);
+
+        // 10. Bottom Internal Feature (j)
+        auto e10_solid = new G4Ellipsoid("E10_Structure", 0.023 * scale, 0.046 * scale, 0.02 * scale);
+        auto e10_log   = new G4LogicalVolume(e10_solid, tissue, "E10_Log");
+        new G4PVPlacement(0, G4ThreeVector(0.06 * scale, -0.605 * scale, 0), e10_log, "E10_Phys", e2_log, false, 0, true);
 
         return phantomPhysical;
     }
